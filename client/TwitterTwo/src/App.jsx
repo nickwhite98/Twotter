@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import deleteIcon from "./assets/delete-button.svg";
 import viteLogo from "/vite.svg";
-import axios from "axios";
 import "./App.css";
+import api from "./api.jsx";
 
 function App() {
   const [notes, setNotes] = useState([]);
   const fetchNotes = async function () {
-    const notesData = await axios.get("http://localhost:3000/api/v1/notes");
+    const notesData = await api.get("/notes");
+    console.log(notesData.data);
     setNotes(notesData.data);
   };
 
@@ -26,6 +27,7 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
+      <Login></Login>
       <h1>Twitter Two</h1>
       <NoteInput fetchNotes={fetchNotes}></NoteInput>
 
@@ -37,17 +39,57 @@ function App() {
             return (
               <Note
                 fetchNotes={fetchNotes}
-                key={note.id}
-                id={note.id}
+                key={note.note_id}
+                id={note.note_id}
                 text={note.text}
                 timestamp={note.timestamp}
-                user={note.user}
+                user={note.username}
               ></Note>
             );
           })}
       </div>
       <p className="read-the-docs"></p>
     </>
+  );
+}
+
+function Login(props) {
+  const [userInput, setUserInput] = useState("");
+  const [passInput, setPassInput] = useState("");
+  const postLogin = async function (username, password) {
+    try {
+      const response = await api.post("/login", {
+        username: username,
+        password: password,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error.response?.data?.error || "login failed");
+    }
+  };
+
+  return (
+    <div>
+      <input
+        value={userInput}
+        onChange={(e) => {
+          setUserInput(e.target.value);
+        }}
+      />
+      <input
+        value={passInput}
+        onChange={(e) => {
+          setPassInput(e.target.value);
+        }}
+      />
+      <button
+        onClick={(e) => {
+          postLogin(userInput, passInput);
+        }}
+      >
+        Login
+      </button>
+    </div>
   );
 }
 
@@ -59,7 +101,7 @@ function Note(props) {
   const user = props.user;
 
   const deleteNote = async function () {
-    const response = await axios.delete("http://localhost:3000/api/v1", {
+    const response = await api.delete("/note", {
       data: { noteID: id },
     });
     if (response.data.error) console.log(response.data.error);
@@ -94,9 +136,13 @@ function NoteInput(props) {
   const fetchNotes = props.fetchNotes;
   const [noteInput, setNoteInput] = useState("");
   const postNote = async function (text) {
-    const response = await axios.post("http://localhost:3000/api/v1/note", {
-      text: noteInput,
-    });
+    const response = await api.post(
+      "/note",
+      {
+        text: noteInput,
+      },
+      { withCredentials: true, sameSite: "None" }
+    );
     if (response.data.error) console.log(response.data.error);
     setNoteInput("");
     fetchNotes();
