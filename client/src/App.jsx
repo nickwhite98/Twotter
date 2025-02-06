@@ -27,6 +27,7 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
+      <Logout></Logout>
       <Login></Login>
       <h1>Twitter Two</h1>
       <NoteInput fetchNotes={fetchNotes}></NoteInput>
@@ -49,6 +50,21 @@ function App() {
           })}
       </div>
       <p className="read-the-docs"></p>
+    </>
+  );
+}
+
+function Logout() {
+  return (
+    <>
+      <button
+        onClick={async function () {
+          const res = await api.post("/logout");
+          console.log(res);
+        }}
+      >
+        Log out dog
+      </button>
     </>
   );
 }
