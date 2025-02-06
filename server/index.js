@@ -34,6 +34,14 @@ db.run(
   "CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, text TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id) )"
 );
 
+const isLoggedIn = function (req) {
+  if (req.cookies.userID) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const insertNote = function (db, text, userID) {
   console.log(userID);
   db.run(
@@ -93,7 +101,11 @@ app.post("/api/v1/login", async function (req, res) {
     const userID = userData.id;
 
     if (password === storedPassword) {
-      res.cookie("userID", userID, { httpOnly: true, sameSite: "None" });
+      res.cookie("userID", userID, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
       res.json({ message: "Logged in successfully", userID: userID });
     } else {
       res.status(400).json({ error: "Wrong password" });
@@ -106,8 +118,7 @@ app.post("/api/v1/login", async function (req, res) {
 
 app.post("/api/v1/logout", async function (req, res) {
   //check if user logged in
-  const user_id = req.cookies.userID;
-  if (user_id) {
+  if (isLoggedIn(req)) {
     //if logged in (check cookie), destroy the cookie!!!
     res.clearCookie("userID", { path: "/" });
     //return message/status - you've logged out
@@ -140,36 +151,48 @@ app.post("/api/v1/user", async function (req, res) {
 });
 
 app.get("/api/v1/notes", async function (req, res) {
-  try {
-    const data = await getNotes(db);
-    res.send(data);
-  } catch (error) {
-    res.status(500).send("error fetching data");
+  if (isLoggedIn(req)) {
+    try {
+      const data = await getNotes(db);
+      res.send(data);
+    } catch (error) {
+      res.status(500).send("error fetching data");
+    }
+  } else {
+    res.status(400).send("Not logged in!");
   }
 });
 
 app.post("/api/v1/note", (req, res) => {
-  const noteText = req.body.text;
-  const userID = req.cookies.userID;
-  if (!noteText) {
-    res.status(400).json({ error: "Text field is required" });
-    return;
+  if (isLoggedIn(req)) {
+    const noteText = req.body.text;
+    const userID = req.cookies.userID;
+    if (!noteText) {
+      res.status(400).json({ error: "Text field is required" });
+      return;
+    }
+    insertNote(db, noteText, userID);
+    res.status(201).json({ success: "Note entered to DB" });
+  } else {
+    res.status(400).send("Not logged in!");
   }
-  insertNote(db, noteText, userID);
-  res.status(201).json({ success: "Note entered to DB" });
 });
 
 app.delete("/api/v1/note", (req, res) => {
-  const noteID = req.body.noteID;
-  db.run("DELETE FROM notes WHERE id= (?)", [noteID], function (err) {
-    if (err) res.status(500).json({ error: "Database error! Oh no!" });
-    if (this.changes === 0) {
-      res
-        .status(500)
-        .json({ error: "No record found with that id, nothing happened" });
-    }
-    res.status(202).json({ success: `Note deleted with id ${noteID}` });
-  });
+  if (isLoggedIn(req)) {
+    const noteID = req.body.noteID;
+    db.run("DELETE FROM notes WHERE id= (?)", [noteID], function (err) {
+      if (err) res.status(500).json({ error: "Database error! Oh no!" });
+      if (this.changes === 0) {
+        res
+          .status(500)
+          .json({ error: "No record found with that id, nothing happened" });
+      }
+      res.status(202).json({ success: `Note deleted with id ${noteID}` });
+    });
+  } else {
+    res.status(400).send("Not logged in!");
+  }
 });
 
 app.listen(3000, () => {

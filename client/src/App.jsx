@@ -9,7 +9,6 @@ function App() {
   const [notes, setNotes] = useState([]);
   const fetchNotes = async function () {
     const notesData = await api.get("/notes");
-    console.log(notesData.data);
     setNotes(notesData.data);
   };
 
@@ -60,7 +59,7 @@ function Logout() {
       <button
         onClick={async function () {
           const res = await api.post("/logout");
-          console.log(res);
+          console.log(res.data);
         }}
       >
         Log out dog
@@ -78,7 +77,6 @@ function Login(props) {
         username: username,
         password: password,
       });
-      console.log(response.data);
     } catch (error) {
       console.log(error.response?.data?.error || "login failed");
     }
