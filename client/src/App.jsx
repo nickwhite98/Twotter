@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
+import flappy from "./assets/flappy.png";
 import deleteIcon from "./assets/delete-button.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -19,16 +20,17 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
+        <h1>Twotter</h1>
+        <a
+          href="https://github.com/nickwhite98?tab=repositories"
+          target="_blank"
+        >
+          <img src={flappy} className="logo spinning-logo" alt="Twotter logo" />
         </a>
       </div>
       <Logout></Logout>
       <Login></Login>
-      <h1>Twitter Two</h1>
+
       <NoteInput fetchNotes={fetchNotes}></NoteInput>
 
       <div>
