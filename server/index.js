@@ -60,7 +60,6 @@ const getNotes = async function (db) {
       }
     );
   });
-  console.log(result);
   return result;
 };
 
@@ -94,7 +93,7 @@ app.post("/api/v1/login", async function (req, res) {
     const userID = userData.id;
 
     if (password === storedPassword) {
-      res.cookie("userID", userID, { httpOnly: true });
+      res.cookie("userID", userID, { httpOnly: true, sameSite: "None" });
       res.json({ message: "Logged in successfully", userID: userID });
     } else {
       res.status(400).json({ error: "Wrong password" });
@@ -102,6 +101,20 @@ app.post("/api/v1/login", async function (req, res) {
   } catch (error) {
     console.log("login error", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/api/v1/logout", async function (req, res) {
+  //check if user logged in
+  const user_id = req.cookies.userID;
+  if (user_id) {
+    //if logged in (check cookie), destroy the cookie!!!
+    res.clearCookie("userID", { path: "/" });
+    //return message/status - you've logged out
+    res.send("Logged out successfully");
+  } else {
+    //do nothing if not logged in
+    return;
   }
 });
 
