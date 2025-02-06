@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
 import flappy from "./assets/flappy.png";
 import deleteIcon from "./assets/delete-button.svg";
-import viteLogo from "/vite.svg";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import api from "./api.jsx";
 
