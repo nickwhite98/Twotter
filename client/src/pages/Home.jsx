@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../AuthProvider.jsx";
 import flappy from "../assets/flappy.png";
 import deleteIcon from "../assets/delete-button.svg";
 import "../App.css";
@@ -12,6 +13,7 @@ import {
 } from "react-router-dom";
 
 function Home() {
+  const { token } = useContext(AuthContext);
   const [notes, setNotes] = useState([]);
   const fetchNotes = async function () {
     const notesData = await api.get("/notes");
@@ -22,34 +24,19 @@ function Home() {
     fetchNotes();
   }, []);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const navigate = useNavigate();
-
-  const fetchLoginState = async function () {
-    const response = await api.get("/auth/status");
-    setIsAuthenticated(response.data.status);
-  };
-
-  useEffect(() => {
-    fetchLoginState();
-  }, []);
-
-  if (isAuthenticated !== null && !isAuthenticated) {
-    navigate("/login");
-  }
-
+  console.log(token);
   return (
     <>
       <div>
-        <h1>Two-tter</h1>
         <a
           href="https://github.com/nickwhite98?tab=repositories"
           target="_blank"
         >
-          <img src={flappy} className="logo spinning-logo" alt="Twotter logo" />
+          <img src={flappy} className="logo" alt="Twotter logo" />
         </a>
+        <h1>Two-tter (Protected)</h1>
+        <p>authenticaed as</p>
       </div>
-      <Logout></Logout>
       <Link to="/Login">Login</Link>
       <NoteInput fetchNotes={fetchNotes}></NoteInput>
 
@@ -71,21 +58,6 @@ function Home() {
           })}
       </div>
       <p className="read-the-docs"></p>
-    </>
-  );
-}
-
-function Logout() {
-  return (
-    <>
-      <button
-        onClick={async function () {
-          const res = await api.post("/logout");
-          console.log(res.data);
-        }}
-      >
-        Log out dog
-      </button>
     </>
   );
 }

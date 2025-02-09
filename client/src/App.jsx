@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,21 +7,50 @@ import {
   Link,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import LoginPage from "./pages/Login";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import api from "./api.jsx";
+import ProtectedRoute from "./ProtectedRoutes.jsx";
+import { AuthProvider, AuthContext } from "./AuthProvider.jsx";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AuthProvider>
+        <Navigation />
+        <Routes>
+          <Route index element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }
+
+const Navigation = (props) => {
+  const { token } = useContext(AuthContext);
+  const { onLogout } = useContext(AuthContext);
+
+  return (
+    <nav>
+      <Link to="/login">Login</Link>
+      <Link to="home">Home</Link>
+      {token && (
+        <button type="button" onClick={onLogout}>
+          Sign Out
+        </button>
+      )}
+    </nav>
+  );
+};
 
 export default App;
 
@@ -33,3 +62,4 @@ export default App;
 // make shit pretty
 // outsource security??????
 // redux
+// tests

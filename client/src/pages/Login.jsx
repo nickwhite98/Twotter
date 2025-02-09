@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import api from "../api.jsx";
 import {
   BrowserRouter as Router,
@@ -7,56 +7,50 @@ import {
   Route,
   Link,
 } from "react-router-dom";
+import { AuthContext } from "../AuthProvider.jsx";
 
-function LoginPage() {
-  return (
-    <>
-      <h1>Login</h1>
-      <Login></Login>
-    </>
-  );
-}
-
-function Login(props) {
-  const [userInput, setUserInput] = useState("");
-  const [passInput, setPassInput] = useState("");
-  const navigate = useNavigate();
-  const postLogin = async function (username, password) {
-    try {
-      const response = await api.post("/login", {
-        username: username,
-        password: password,
-      });
-      console.log(response.data.message);
-      if (response.data.message) navigate("/");
-    } catch (error) {
-      console.log(error.response?.data?.error || "login failed");
-    }
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { onLogin } = useContext(AuthContext);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onLogin(email, password);
   };
 
   return (
-    <div>
-      <input
-        value={userInput}
-        onChange={(e) => {
-          setUserInput(e.target.value);
-        }}
-      />
-      <input
-        value={passInput}
-        onChange={(e) => {
-          setPassInput(e.target.value);
-        }}
-      />
-      <button
-        onClick={(e) => {
-          postLogin(userInput, passInput);
-        }}
-      >
-        Login
-      </button>
-    </div>
+    <>
+      <h1>Login (PUBLIC)</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <input
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+          />
+          <input
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+        </div>
+        <button type="submit">Sign in</button>
+      </form>
+    </>
   );
 }
+export default Login;
 
-export default LoginPage;
+// }
+// function LoginOLD({ onLogin }) {
+
+//   const navigate = useNavigate();
+
+//   };
+
+//   return (
+
+//   );
+// }

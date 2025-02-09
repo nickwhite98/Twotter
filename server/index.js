@@ -92,10 +92,11 @@ const getPassword = async function (username) {
 };
 
 app.get("/api/v1/auth/status", async (req, res) => {
+  const userID = req.cookies.userID;
   if (isLoggedIn(req)) {
-    res.json({ status: true });
+    res.json({ message: "Logged in successfully", userID: userID });
   } else {
-    res.json({ status: false });
+    res.json({ message: "not logged on", userID: "" });
   }
 });
 
@@ -106,7 +107,11 @@ app.post("/api/v1/login", async function (req, res) {
     const password = req.body.password;
 
     const userData = await getPassword(username);
-    const storedPassword = userData.password;
+    if (userData === null) {
+      res.status(400).json({ error: "No user" });
+      return;
+    }
+    const storedPassword = userData?.password;
     const userID = userData.id;
 
     if (password === storedPassword) {
