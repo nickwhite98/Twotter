@@ -150,6 +150,7 @@ app.get("/", (req, res) => {
 app.post("/api/v1/user", async function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
+  console.log(username, password);
   //inserting plaintext password is BAD
   db.run(
     "INSERT INTO users (username, password) VALUES (?, ?)",
@@ -162,6 +163,27 @@ app.post("/api/v1/user", async function (req, res) {
       res.status(201).json({ success: "user has entered the shack 😍" });
     }
   );
+});
+
+app.post("/api/v1/userexist", async function (req, res) {
+  const username = req.body.username;
+  console.log(username);
+  const result = await new Promise((resolve, reject) => {
+    db.get(
+      "SELECT username FROM users WHERE username=(?)",
+      [username],
+      (err, row) => {
+        if (err) {
+          reject(err);
+        } else if (row) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      }
+    );
+  });
+  res.status(200).json({ userExist: result });
 });
 
 app.get("/api/v1/notes", async function (req, res) {

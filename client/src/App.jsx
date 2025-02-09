@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./ProtectedRoutes.jsx";
 import { AuthProvider, AuthContext } from "./AuthProvider.jsx";
+import { SignUp } from "./pages/Signup.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route index element={<Login />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route
             path="/home"
             element={
@@ -41,8 +43,9 @@ const Navigation = (props) => {
 
   return (
     <nav>
-      <Link to="/login">Login</Link>
       <Link to="home">Home</Link>
+      <Link to="/login">Login</Link>
+      <Link to="/signup">Sign Up</Link>
       {token && (
         <button type="button" onClick={onLogout}>
           Sign Out
