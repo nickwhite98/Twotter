@@ -18,6 +18,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+//could use middleware to make the check logged in shit easier
 
 const db = new sqlite3.Database("./datafuckshack.db");
 
@@ -90,6 +91,15 @@ const getPassword = async function (username) {
   return result;
 };
 
+app.get("/api/v1/auth/status", async (req, res) => {
+  const userID = req.cookies.userID;
+  if (isLoggedIn(req)) {
+    res.json({ message: "Logged in successfully", userID: userID });
+  } else {
+    res.json({ message: "not logged on", userID: "" });
+  }
+});
+
 //post req -
 app.post("/api/v1/login", async function (req, res) {
   try {
@@ -97,7 +107,11 @@ app.post("/api/v1/login", async function (req, res) {
     const password = req.body.password;
 
     const userData = await getPassword(username);
-    const storedPassword = userData.password;
+    if (userData === null) {
+      res.status(400).json({ error: "No user" });
+      return;
+    }
+    const storedPassword = userData?.password;
     const userID = userData.id;
 
     if (password === storedPassword) {

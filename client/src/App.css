@@ -6,13 +6,9 @@
 }
 
 .logo {
-  height: 10em;
-  padding: 0em;
+  height: 30em;
   will-change: filter;
   transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
 }
 
 .spinning-logo {
