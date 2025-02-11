@@ -14,8 +14,12 @@ const AuthProvider = ({ children }) => {
 
   const checkIfLoggedIn = async function () {
     const token = await api.get("/auth/status");
-    setToken(token.data);
-    navigate("/home");
+    if (token.data.userID === "") {
+      setToken("");
+    } else {
+      setToken(token.data);
+      navigate("/home");
+    }
   };
 
   useEffect(() => {
