@@ -14,7 +14,7 @@ const AuthProvider = ({ children }) => {
 
   const checkIfLoggedIn = async function () {
     const token = await api.get("/auth/status");
-    setToken(token.data.userID);
+    setToken(token.data);
     navigate("/home");
   };
 
@@ -28,7 +28,7 @@ const AuthProvider = ({ children }) => {
         username: username,
         password: password,
       });
-      setToken(token.data.userID);
+      setToken(token.data);
       navigate("/home");
     } catch (error) {
       console.log(error || "login failed");

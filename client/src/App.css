@@ -1,7 +1,7 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+
   text-align: center;
 }
 
@@ -13,6 +13,41 @@
 
 .spinning-logo {
   animation: logo-spin infinite 20s linear;
+}
+
+.main-content {
+  display: block;
+  padding-top: 80px; /* Adjust based on your navbar height */
+}
+
+.nav {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #000000;
+  color: white;
+  padding: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  z-index: 100; /* Increase if needed */
+}
+
+.nav-links {
+  display: flex; /* Makes the links align in a row */
+  gap: 20px; /* Adds space between links */
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+}
+
+.nav-links a:hover {
+  color: #d1d5db;
 }
 
 @keyframes logo-spin {

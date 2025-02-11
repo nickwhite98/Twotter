@@ -5,11 +5,12 @@ function SignUp() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [reEnterPassword, setreEnterPassword] = useState("");
-  const [userAvailable, setUserAvailable] = useState("OG");
+  const [userAvailableMsg, setUserAvailableMsg] = useState("");
+  const [isUserAvailable, setIsUserAvailable] = useState("");
 
   useEffect(() => {
     if (!username) {
-      setUserAvailable("");
+      setUserAvailableMsg("");
       return;
     } // don't check empty username input
 
@@ -22,27 +23,31 @@ function SignUp() {
 
   const handleSubmit = async function (e) {
     e.preventDefault();
-    if (password === reEnterPassword) {
+    if (password !== reEnterPassword || password === "") {
+      alert("Passwords do not match, please try again");
+      setPassword("");
+      setreEnterPassword("");
+    } else if (!isUserAvailable) {
+      alert("Username is not available");
+    } else {
       const response = await api.post("/user", {
         username: username,
         password: password,
       });
-    } else {
-      alert("Passwords do not match, please try again");
-      setPassword("");
-      setreEnterPassword("");
     }
   };
-
   const checkUsernameAvailable = async function () {
     console.log(`I checked ${username}`);
     const response = await api.post("/userexist", {
       username: username,
     });
     if (response.data.userExist) {
-      setUserAvailable(`Username: ${username} is not available`);
+      setUserAvailableMsg(`Username: ${username} is not available`);
+      setIsUserAvailable(false);
+      console.log("user isn't allowed", isUserAvailable);
     } else {
-      setUserAvailable(`Username: ${username} is Available!`);
+      setUserAvailableMsg(`Username: ${username} is Available!`);
+      setIsUserAvailable(true);
     }
     console.log(response.data.userExist);
   };
@@ -50,7 +55,7 @@ function SignUp() {
   return (
     <>
       <h1>Create Account (PUBLIC)</h1>
-      <form onSubmit={checkUsernameAvailable}>
+      <form onSubmit={handleSubmit}>
         <div>
           <input
             type=""
@@ -62,7 +67,7 @@ function SignUp() {
             onBlur={(e) => (e.target.placeholder = "Username")}
             placeholder="Username"
           />
-          <p>{userAvailable}</p>
+          <p>{userAvailableMsg}</p>
           <input
             value={password}
             onChange={(e) => {

@@ -5,13 +5,17 @@ import {
   useNavigate,
   Route,
   Link,
+  useParams,
 } from "react-router-dom";
+
+//Import pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./ProtectedRoutes.jsx";
 import { AuthProvider, AuthContext } from "./AuthProvider.jsx";
 import { SignUp } from "./pages/Signup.jsx";
+import Account from "./pages/Account.jsx";
 
 function App() {
   return (
@@ -30,6 +34,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/account/:username"
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
@@ -42,15 +54,19 @@ const Navigation = (props) => {
   const { onLogout } = useContext(AuthContext);
 
   return (
-    <nav>
-      <Link to="home">Home</Link>
-      <Link to="/login">Login</Link>
-      <Link to="/signup">Sign Up</Link>
-      {token && (
-        <button type="button" onClick={onLogout}>
-          Sign Out
-        </button>
-      )}
+    <nav className="nav">
+      <h1>Two-tter</h1>
+      <div className="nav-links">
+        <Link to="home">Home</Link>
+        <Link to="/login">Login</Link>
+        <Link to="/signup">Sign Up</Link>
+        <Link to={`/account/${token.username}`}>Account</Link>
+        {token && (
+          <button className="nav-links" type="button" onClick={onLogout}>
+            Sign Out
+          </button>
+        )}
+      </div>
     </nav>
   );
 };

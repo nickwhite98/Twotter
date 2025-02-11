@@ -14,6 +14,8 @@ import {
 
 function Home() {
   const { token } = useContext(AuthContext);
+  const userID = token.userID;
+  const username = token.username;
   const [notes, setNotes] = useState([]);
   const fetchNotes = async function () {
     const notesData = await api.get("/notes");
@@ -24,40 +26,41 @@ function Home() {
     fetchNotes();
   }, []);
 
-  console.log(token);
   return (
     <>
-      <div>
-        <a
-          href="https://github.com/nickwhite98?tab=repositories"
-          target="_blank"
-        >
-          <img src={flappy} className="logo" alt="Twotter logo" />
-        </a>
-        <h1>Two-tter (Protected)</h1>
-        <p>authenticaed as</p>
-      </div>
-      <Link to="/Login">Login</Link>
-      <NoteInput fetchNotes={fetchNotes}></NoteInput>
+      <div className="main-content">
+        <div>
+          <a
+            href="https://github.com/nickwhite98?tab=repositories"
+            target="_blank"
+          >
+            <img src={flappy} className="logo" alt="Twotter logo" />
+          </a>
+          <h1>Two-tter (Protected)</h1>
+          <p>authenticaed as</p>
+        </div>
+        <Link to="/Login">Login</Link>
+        <NoteInput fetchNotes={fetchNotes}></NoteInput>
 
-      <div>
-        {notes
-          .slice()
-          .reverse()
-          .map((note) => {
-            return (
-              <Note
-                fetchNotes={fetchNotes}
-                key={note.note_id}
-                id={note.note_id}
-                text={note.text}
-                timestamp={note.timestamp}
-                user={note.username}
-              ></Note>
-            );
-          })}
+        <div>
+          {notes
+            .slice()
+            .reverse()
+            .map((note) => {
+              return (
+                <Note
+                  fetchNotes={fetchNotes}
+                  key={note.note_id}
+                  id={note.note_id}
+                  text={note.text}
+                  timestamp={note.timestamp}
+                  user={note.username}
+                ></Note>
+              );
+            })}
+        </div>
+        <p className="read-the-docs"></p>
       </div>
-      <p className="read-the-docs"></p>
     </>
   );
 }

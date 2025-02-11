@@ -93,8 +93,28 @@ const getPassword = async function (username) {
 
 app.get("/api/v1/auth/status", async (req, res) => {
   const userID = req.cookies.userID;
+  const result = await new Promise((resolve, reject) => {
+    db.all("SELECT username FROM users WHERE id=(?)", [userID], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+
+  console.log(result);
+  if (!result) {
+    return;
+  }
+  const username = result[0].username;
+
   if (isLoggedIn(req)) {
-    res.json({ message: "Logged in successfully", userID: userID });
+    res.json({
+      message: "Logged in successfully",
+      userID: userID,
+      username: username,
+    });
   } else {
     res.json({ message: "not logged on", userID: "" });
   }
@@ -120,7 +140,11 @@ app.post("/api/v1/login", async function (req, res) {
         secure: true,
         sameSite: "None",
       });
-      res.json({ message: "Logged in successfully", userID: userID });
+      res.json({
+        message: "Logged in successfully",
+        userID: userID,
+        username: username,
+      });
     } else {
       res.status(400).json({ error: "Wrong password" });
     }
