@@ -102,16 +102,15 @@ app.get("/api/v1/auth/status", async (req, res) => {
       }
     });
   });
-  console.log(userID);
 
   if (isLoggedIn(req)) {
-    console.log("hello");
+    const username = result[0].username;
     res.json({
       message: "Logged in successfully",
       userID: userID,
+      username: username,
     });
   } else {
-    console.log("not logged in");
     res.json({ message: "not logged on", userID: "" });
   }
 });
