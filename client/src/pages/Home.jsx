@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
-import flappy from "../assets/flappy.png";
+
 import deleteIcon from "../assets/delete-button.svg";
 import "../App.css";
 import api from "../api.jsx";
@@ -29,17 +29,6 @@ function Home() {
   return (
     <>
       <div className="main-content">
-        <div>
-          <a
-            href="https://github.com/nickwhite98?tab=repositories"
-            target="_blank"
-          >
-            <img src={flappy} className="logo" alt="Twotter logo" />
-          </a>
-          <h1>Two-tter (Protected)</h1>
-          <p>authenticaed as</p>
-        </div>
-        <Link to="/Login">Login</Link>
         <NoteInput fetchNotes={fetchNotes}></NoteInput>
 
         <div>

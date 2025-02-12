@@ -93,17 +93,21 @@ const getPassword = async function (username) {
 
 app.get("/api/v1/auth/status", async (req, res) => {
   const userID = req.cookies.userID;
-  const result = await new Promise((resolve, reject) => {
-    db.all("SELECT username FROM users WHERE id=(?)", [userID], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
 
   if (isLoggedIn(req)) {
+    const result = await new Promise((resolve, reject) => {
+      db.all(
+        "SELECT username FROM users WHERE id=(?)",
+        [userID],
+        (err, rows) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(rows);
+          }
+        }
+      );
+    });
     const username = result[0].username;
     res.json({
       message: "Logged in successfully",

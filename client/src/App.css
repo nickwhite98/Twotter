@@ -6,9 +6,12 @@
 }
 
 .logo {
-  height: 10em;
-  will-change: filter;
-  transition: filter 300ms;
+  height: 8em;
+}
+
+.title {
+  color: #e3dbdb;
+  margin-left: -20px;
 }
 
 .spinning-logo {
@@ -17,7 +20,7 @@
 
 .main-content {
   display: block;
-  padding-top: 80px; /* Adjust based on your navbar height */
+  padding-top: 150px; /* Adjust based on your navbar height */
 }
 
 .nav {
@@ -36,9 +39,17 @@
   z-index: 100; /* Increase if needed */
 }
 
+.nav-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0px;
+}
+
 .nav-links {
   display: flex; /* Makes the links align in a row */
   gap: 20px; /* Adds space between links */
+  margin-right: 3em;
 }
 
 .nav-links a {

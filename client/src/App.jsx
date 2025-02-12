@@ -1,12 +1,6 @@
-import { useState, useEffect, createContext, useContext } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  useNavigate,
-  Route,
-  Link,
-  useParams,
-} from "react-router-dom";
+import { useContext } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import flappy from "./assets/flappy.png";
 
 //Import pages
 import Home from "./pages/Home";
@@ -23,17 +17,17 @@ function App() {
       <AuthProvider>
         <Navigation />
         <Routes>
-          <Route index element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
           <Route
-            path="/home"
+            index
             element={
               <ProtectedRoute>
                 <Home />
               </ProtectedRoute>
             }
           />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+
           <Route
             path="/account/:username"
             element={
@@ -51,21 +45,24 @@ function App() {
 
 const Navigation = (props) => {
   const { token } = useContext(AuthContext);
-  const { onLogout } = useContext(AuthContext);
 
   return (
     <nav className="nav">
-      <h1>Two-tter</h1>
+      <div className="nav-left">
+        <a
+          href="https://github.com/nickwhite98?tab=repositories"
+          target="_blank"
+        >
+          <img src={flappy} className="logo" alt="Twotter logo" />
+        </a>
+        <h1 className="title">Two-tter</h1>
+      </div>
+
       <div className="nav-links">
-        <Link to="home">Home</Link>
-        <Link to="/login">Login</Link>
-        <Link to="/signup">Sign Up</Link>
-        <Link to={`/account/${token.username}`}>Account</Link>
-        {token && (
-          <button className="nav-links" type="button" onClick={onLogout}>
-            Sign Out
-          </button>
-        )}
+        {token && <Link to="/">Home</Link>}
+        {token && <Link to={`/account/${token.username}`}>Account</Link>}
+        {!token && <Link to="/login">Login</Link>}
+        {!token && <Link to="/signup">Sign Up</Link>}
       </div>
     </nav>
   );
