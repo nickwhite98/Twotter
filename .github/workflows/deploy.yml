@@ -11,6 +11,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    enviornment: Two-tter Deploy Environment
 
     steps:
       - name: Debug
