@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import api from "./api.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AuthContext = createContext({
   token: "",
@@ -11,11 +11,19 @@ const AuthContext = createContext({
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const checkIfLoggedIn = async function () {
     const token = await api.get("/auth/status");
-    setToken(token.data.userID);
-    navigate("/home");
+    console.log(token.data.userID);
+    if (token.data.userID === "") {
+      setToken("");
+    } else {
+      setToken(token.data);
+      console.log(location.pathname);
+      const origin = location.pathname || "/";
+      navigate(origin);
+    }
   };
 
   useEffect(() => {
@@ -28,8 +36,8 @@ const AuthProvider = ({ children }) => {
         username: username,
         password: password,
       });
-      setToken(token.data.userID);
-      navigate("/home");
+      setToken(token.data);
+      navigate("/");
     } catch (error) {
       console.log(error || "login failed");
     }

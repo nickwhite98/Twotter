@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import api from "../api.jsx";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,12 +10,12 @@ import {
 import { AuthContext } from "../AuthProvider.jsx";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { onLogin } = useContext(AuthContext);
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin(email, password);
+    onLogin(username, password);
   };
 
   return (
@@ -24,9 +24,9 @@ function Login() {
       <form onSubmit={handleSubmit}>
         <div>
           <input
-            value={email}
+            value={username}
             onChange={(e) => {
-              setEmail(e.target.value);
+              setUsername(e.target.value);
             }}
           />
           <input
@@ -42,15 +42,3 @@ function Login() {
   );
 }
 export default Login;
-
-// }
-// function LoginOLD({ onLogin }) {
-
-//   const navigate = useNavigate();
-
-//   };
-
-//   return (
-
-//   );
-// }
