@@ -13,13 +13,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug
+        env:
+          PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          HOSTNAME: ${{ secrets.SERVER_HOST }}
+          USER_NAME: ${{ secrets.SERVER_USER }}
+        run: |
+          echo "HOSTNAME: $HOSTNAME"
+          echo "USER_NAME: $USER_NAME"
+          echo "PRIVATE_KEY is set: " $(if [ -n "$PRIVATE_KEY" ]; then echo "Yes"; else echo "No"; fi)
+
       - uses: actions/checkout@v2
       - name: Build & Deploy
         env:
           PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          HOSTNAME: ${{secrets.SERVER_HOST}}
-          USER_NAME: ${{secrets.SERVER_USER}}
+          HOSTNAME: ${{ secrets.SERVER_HOST }}
+          USER_NAME: ${{ secrets.SERVER_USER }}
         run: |
+
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -i private_key ${USER_NAME}@${HOSTNAME} '
 
