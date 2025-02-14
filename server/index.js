@@ -173,10 +173,6 @@ app.post("/api/v1/logout", async function (req, res) {
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("HELLO!!!!");
-});
-
 app.post("/api/v1/user", async function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
