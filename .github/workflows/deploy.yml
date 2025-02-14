@@ -12,19 +12,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Debug
-        env:
-          PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          HOSTNAME: ${{ secrets.SERVER_HOST }}
-          USER_NAME: ${{ secrets.SERVER_USER }}
-        run: |
-          echo "HOSTNAME: $HOSTNAME"
-          echo "USER_NAME: $USER_NAME"
-          echo "PRIVATE_KEY is set: " $(if [ -n "$PRIVATE_KEY" ]; then echo "Yes"; else echo "No"; fi)
-
       - uses: actions/checkout@v2
-      - name: Build & Deploy
+      
+      - name: Build Client (Vite React)
+        run: |
+          cd client
+          npm install
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .env.production
+          npm run build
+        
+      - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           HOSTNAME: ${{ secrets.SERVER_HOST }}
@@ -32,10 +29,18 @@ jobs:
         run: |
 
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+          ssh -o StrictHostKeyChecking=no-i private_key ${USER_NAME}@${HOSTNAME} '
 
             cd ~/Twotter/server
             git pull origin main
             npm install
-            pm2 restart index.js
-            '
+            
+            # Ensure frontend directory exists inside server (for serving static files)
+            mkdir -p ~/Twotter/server/public
+
+            # Move React build (client/dist/) to server/public/
+            rsync -av --delete ~/Twotter/client/dist/ ~/Twotter/server/public/
+
+            # Restart Express server
+            pm2 restart index.js || pm2 start index.js --name "server"
+            pm2 save

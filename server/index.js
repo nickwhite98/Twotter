@@ -22,6 +22,13 @@ app.use(cookieParser());
 
 const db = new sqlite3.Database("./datafuckshack.db");
 
+//serve React frontend
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 //create users table
 db.run(
   `CREATE TABLE IF NOT EXISTS users (
