@@ -14,6 +14,7 @@ const cookieParser = require("cookie-parser");
 // check existing endpoints, only allow if logged in
 
 //Only need CORS in Development, Prod has same origin
+console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === "development") {
   app.use(
     cors({
