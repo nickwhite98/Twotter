@@ -30,11 +30,13 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key "${USER_NAME}@${HOSTNAME}" "
-            cd ~/Twotter/server
+            cd ~/Twotter
             git pull origin main
+            
+            # Install dependencies for client and server
+            cd server
             npm install
             
-            # Install dependencies for client too
             cd ../client
             npm install
 
