@@ -18,7 +18,7 @@ jobs:
       - name: Build Client (Vite React)
         run: |
           cd client
-          echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env
+          echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env.production
           npm install
           npm run build
 
