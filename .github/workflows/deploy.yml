@@ -20,7 +20,7 @@ jobs:
           cd client
           echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env.production
           npm install
-          npm run build
+          npm run build --mode production
 
       - name: Deploy to EC2
         env:
