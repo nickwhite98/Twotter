@@ -3,6 +3,7 @@ const session = require("express-session");
 const app = express();
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
+const path = require("path");
 const cookieParser = require("cookie-parser");
 const corsOptions = {
   origin: "http://localhost:5173",
@@ -22,12 +23,14 @@ app.use(cookieParser());
 
 const db = new sqlite3.Database("./datafuckshack.db");
 
-//serve React frontend
-app.use(express.static(path.join(__dirname, "public")));
+if (process.env.NODE_ENV === "production") {
+  //serve React frontend
+  app.use(express.static(path.join(__dirname, "public")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+  });
+}
 
 //create users table
 db.run(
