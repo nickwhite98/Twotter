@@ -15,12 +15,10 @@ const AuthProvider = ({ children }) => {
 
   const checkIfLoggedIn = async function () {
     const token = await api.get("/auth/status");
-    console.log(token.data.userID);
     if (token.data.userID === "") {
       setToken("");
     } else {
       setToken(token.data);
-      console.log(location.pathname);
       const origin = location.pathname || "/";
       navigate(origin);
     }

@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const app = express();
@@ -5,10 +6,6 @@ const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const corsOptions = {
-  origin: "http://localhost:5173",
-  credentials: true,
-};
 
 // API Endpoints - User create
 // Log in
@@ -16,7 +13,15 @@ const corsOptions = {
 // UI For all dat
 // check existing endpoints, only allow if logged in
 
-app.use(cors(corsOptions));
+//Only need CORS in Development, Prod has same origin
+if (process.env.NODE_ENV === "development") {
+  app.use(
+    cors({
+      origin: "http://localhost:5173",
+      credentials: true,
+    })
+  );
+}
 app.use(express.json());
 app.use(cookieParser());
 //could use middleware to make the check logged in shit easier
