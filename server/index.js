@@ -21,6 +21,13 @@ if (process.env.NODE_ENV === "development") {
       credentials: true,
     })
   );
+} else {
+  app.use(
+    cors({
+      origin: "http://3.16.68.73:3000",
+      credentials: true,
+    })
+  );
 }
 app.use(express.json());
 app.use(cookieParser());
