@@ -33,11 +33,12 @@ jobs:
             git pull origin main
 
             # Create or update the .env file in the server directory with VITE_API_URL
-            cd server
+            cd client
             echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env
 
             # Install dependencies for client and server
-            cd server
+            cd ../server
+            echo 'NODE_ENV=production' > .env
             npm install
             
             cd ../client
