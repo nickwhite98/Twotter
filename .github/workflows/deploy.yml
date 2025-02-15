@@ -48,6 +48,6 @@ jobs:
             rsync -av --delete ~/Twotter/client/dist/ ~/Twotter/server/public/
 
             # Restart Express server
-            NODE_ENV=production pm2 restart index.js || NODE_ENV=production pm2 start index.js --name 'server'
+            pm2 restart index.js || pm2 start index.js --name 'server'
             pm2 save
           "
