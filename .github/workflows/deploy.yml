@@ -18,6 +18,7 @@ jobs:
       - name: Build Client (Vite React)
         run: |
           cd client
+          echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env
           npm install
           npm run build
 
@@ -32,15 +33,16 @@ jobs:
             cd ~/Twotter
             git pull origin main
 
-            # Create or update the .env file in the server directory with VITE_API_URL
             cd client
             echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env
 
-            # Install dependencies for client and server
+
+            # Install dependencies for server
             cd ../server
             echo 'NODE_ENV=production' > .env
             npm install
-            
+
+            # Install dependencies for client (if needed)
             cd ../client
             npm install
 
