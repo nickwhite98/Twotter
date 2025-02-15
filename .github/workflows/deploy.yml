@@ -15,19 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build Client (Vite React)
-        run: |
-          cd client
-          echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env.production
-          npm install
-          npm run build -- --mode production
-
-      - name: Check .env.production
-        run: |
-          cd client
-          echo "Contents of .env.production:"
-          cat .env.production
-
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
@@ -40,16 +27,16 @@ jobs:
             git pull origin main
 
             cd client
+            echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env.production
+            npm install
+            npm run build -- --mode production
+
             echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env
 
 
             # Install dependencies for server
             cd ../server
             echo 'NODE_ENV=production' > .env
-            npm install
-
-            # Install dependencies for client (if needed)
-            cd ../client
             npm install
 
             # Ensure frontend directory exists inside server (for serving static files)
