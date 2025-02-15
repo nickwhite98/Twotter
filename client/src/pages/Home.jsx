@@ -32,21 +32,22 @@ function Home() {
         <NoteInput fetchNotes={fetchNotes}></NoteInput>
 
         <div>
-          {notes
-            .slice()
-            .reverse()
-            .map((note) => {
-              return (
-                <Note
-                  fetchNotes={fetchNotes}
-                  key={note.note_id}
-                  id={note.note_id}
-                  text={note.text}
-                  timestamp={note.timestamp}
-                  user={note.username}
-                ></Note>
-              );
-            })}
+          {notes &&
+            notes
+              .slice()
+              .reverse()
+              .map((note) => {
+                return (
+                  <Note
+                    fetchNotes={fetchNotes}
+                    key={note.note_id}
+                    id={note.note_id}
+                    text={note.text}
+                    timestamp={note.timestamp}
+                    user={note.username}
+                  ></Note>
+                );
+              })}
         </div>
         <p className="read-the-docs"></p>
       </div>
