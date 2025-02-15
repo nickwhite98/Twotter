@@ -22,6 +22,12 @@ jobs:
           npm install
           npm run build -- --mode production
 
+      - name: Check .env.production
+        run: |
+          cd client
+          echo "Contents of .env.production:"
+          cat .env.production
+
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
