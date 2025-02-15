@@ -33,8 +33,13 @@ jobs:
             cd ~/Twotter/server
             git pull origin main
             npm install
+            
+            # Install dependencies for client too
+            cd ../client
+            npm install
 
             # Ensure frontend directory exists inside server (for serving static files)
+            cd ../server
             mkdir -p ~/Twotter/server/public
 
             # Move React build (client/dist/) to server/public/
