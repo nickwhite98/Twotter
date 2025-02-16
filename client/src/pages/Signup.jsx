@@ -1,7 +1,9 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import api from "../api.jsx";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [reEnterPassword, setreEnterPassword] = useState("");
@@ -34,22 +36,23 @@ function SignUp() {
         username: username,
         password: password,
       });
+      console.log(response);
+      if (response.data.success) {
+        navigate("/login");
+      }
     }
   };
   const checkUsernameAvailable = async function () {
-    console.log(`I checked ${username}`);
     const response = await api.post("/userexist", {
       username: username,
     });
     if (response.data.userExist) {
       setUserAvailableMsg(`Username: ${username} is not available`);
       setIsUserAvailable(false);
-      console.log("user isn't allowed", isUserAvailable);
     } else {
       setUserAvailableMsg(`Username: ${username} is Available!`);
       setIsUserAvailable(true);
     }
-    console.log(response.data.userExist);
   };
 
   return (

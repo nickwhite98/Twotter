@@ -104,6 +104,7 @@ const getPassword = async function (username) {
   return result;
 };
 
+//CHECK IF USER LOGGED IN
 app.get("/api/v1/auth/status", async (req, res) => {
   const userID = req.cookies.userID;
   if (isLoggedIn(req)) {
@@ -143,7 +144,7 @@ app.get("/api/v1/auth/status", async (req, res) => {
   }
 });
 
-//post req -
+//LOGIN
 app.post("/api/v1/login", async function (req, res) {
   try {
     const username = req.body.username;
@@ -177,6 +178,7 @@ app.post("/api/v1/login", async function (req, res) {
   }
 });
 
+//LOGOUT
 app.post("/api/v1/logout", async function (req, res) {
   //check if user logged in
   if (isLoggedIn(req)) {
@@ -195,6 +197,7 @@ app.post("/api/v1/logout", async function (req, res) {
   }
 });
 
+//CREATE USER
 app.post("/api/v1/user", async function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
@@ -213,6 +216,7 @@ app.post("/api/v1/user", async function (req, res) {
   );
 });
 
+//CHECK IF USER EXISTS
 app.post("/api/v1/userexist", async function (req, res) {
   const username = req.body.username;
   console.log(username);
@@ -234,6 +238,7 @@ app.post("/api/v1/userexist", async function (req, res) {
   res.status(200).json({ userExist: result });
 });
 
+//GETS ALL NOTES
 app.get("/api/v1/notes", async function (req, res) {
   if (isLoggedIn(req)) {
     try {
@@ -247,6 +252,7 @@ app.get("/api/v1/notes", async function (req, res) {
   }
 });
 
+//POSTS NEW NOTE
 app.post("/api/v1/note", (req, res) => {
   if (isLoggedIn(req)) {
     const noteText = req.body.text;
@@ -262,6 +268,7 @@ app.post("/api/v1/note", (req, res) => {
   }
 });
 
+//DELETES NOTE
 app.delete("/api/v1/note", (req, res) => {
   const currentUserID = req.cookies.userID;
   const authorID = req.body.authorID.toString();
