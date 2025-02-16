@@ -20,8 +20,8 @@ function Home() {
   const fetchNotes = async function () {
     const notesData = await api.get("/notes");
     setNotes(notesData.data);
-    console.log(`Notes is this: ${notesData.data}`);
-    console.log();
+    console.log("Is Notes array?:", Array.isArray(notesData.data));
+    console.log(`Notes is this: ${JSON.stringify(notesData.data, null, 2)}`);
   };
 
   useEffect(() => {
