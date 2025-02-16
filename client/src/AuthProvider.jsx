@@ -29,15 +29,18 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const handleLogin = async function (username, password) {
+    //attempts to login. If login successful, returns true and returns false otherwise
+
     try {
-      const token = await api.post("/login", {
+      const response = await api.post("/login", {
         username: username,
         password: password,
       });
-      setToken(token.data);
+      setToken(response.data);
       navigate("/");
+      return true;
     } catch (error) {
-      console.log(error || "login failed");
+      return false;
     }
   };
 
