@@ -47,11 +47,11 @@ function Home() {
                     text={note.text}
                     timestamp={note.timestamp}
                     user={note.username}
+                    currentUser={username}
                   ></Note>
                 );
               })}
         </div>
-        <p className="read-the-docs"></p>
       </div>
     </>
   );
@@ -62,7 +62,8 @@ function Note(props) {
   const id = props.id;
   const text = props.text;
   const timestamp = props.timestamp;
-  const user = props.user;
+  const author = props.user;
+  const currentUser = props.currentUser;
 
   const deleteNote = async function () {
     const response = await api.delete("/note", {
@@ -73,27 +74,40 @@ function Note(props) {
     fetchNotes();
   };
 
-  return (
-    <div className="note">
-      <button
-        className="delete-button"
-        onClick={(e) => {
-          deleteNote();
-        }}
-      >
-        <img
-          src={deleteIcon}
-          className={"filter-white" + " " + "delete-icon"}
-        ></img>
-      </button>
-      <h3>{user} Says:</h3>
+  if (currentUser === author) {
+    return (
+      <div className="note">
+        <button
+          className="delete-button"
+          onClick={(e) => {
+            deleteNote();
+          }}
+        >
+          <img
+            src={deleteIcon}
+            className={"filter-white" + " " + "delete-icon"}
+          ></img>
+        </button>
+        <h3>{author} Says:</h3>
 
-      <p>{text}</p>
-      <p>
-        {timestamp} <br></br>id: {id}
-      </p>
-    </div>
-  );
+        <p>{text}</p>
+        <p>
+          {timestamp} <br></br>id: {id}
+        </p>
+      </div>
+    );
+  } else {
+    return (
+      <div className="note">
+        <h3>{author} Says:</h3>
+
+        <p>{text}</p>
+        <p>
+          {timestamp} <br></br>id: {id}
+        </p>
+      </div>
+    );
+  }
 }
 
 function NoteInput(props) {
