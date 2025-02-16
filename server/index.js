@@ -35,15 +35,6 @@ app.use(cookieParser());
 
 const db = new sqlite3.Database("./datafuckshack.db");
 
-if (process.env.NODE_ENV === "production") {
-  //serve React frontend
-  app.use(express.static(path.join(__dirname, "public")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-  });
-}
-
 //create users table
 db.run(
   `CREATE TABLE IF NOT EXISTS users (
@@ -287,6 +278,19 @@ app.delete("/api/v1/note", (req, res) => {
     res.status(400).send("Not logged in!");
   }
 });
+
+if (process.env.NODE_ENV === "production") {
+  //serve React frontend
+  app.use(express.static(path.join(__dirname, "public")));
+
+  app.get("*", (req, res) => {
+    if (req.path.startsWith("/api")) {
+      // Let the request be handled by other routes
+      return next();
+    }
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+  });
+}
 
 app.listen(3000, () => {
   console.log("server listening on port http://localhost:3000");
