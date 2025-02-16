@@ -14,7 +14,6 @@ const cookieParser = require("cookie-parser");
 // check existing endpoints, only allow if logged in
 
 //Only need CORS in Development, Prod has same origin
-console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === "development") {
   app.use(
     cors({
@@ -116,7 +115,6 @@ const getPassword = async function (username) {
 
 app.get("/api/v1/auth/status", async (req, res) => {
   const userID = req.cookies.userID;
-
   if (isLoggedIn(req)) {
     const result = await new Promise((resolve, reject) => {
       db.all(
@@ -159,8 +157,8 @@ app.post("/api/v1/login", async function (req, res) {
     if (password === storedPassword) {
       res.cookie("userID", userID, {
         httpOnly: true,
-        secure: true,
-        sameSite: "None",
+        secure: process.env.NODE_ENV === "production" ? false : true,
+        sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
       });
       res.json({
         message: "Logged in successfully",
