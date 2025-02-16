@@ -46,7 +46,8 @@ function Home() {
                     id={note.note_id}
                     text={note.text}
                     timestamp={note.timestamp}
-                    user={note.username}
+                    author={note.username}
+                    authorID={note.user_id}
                     currentUser={username}
                   ></Note>
                 );
@@ -62,12 +63,13 @@ function Note(props) {
   const id = props.id;
   const text = props.text;
   const timestamp = props.timestamp;
-  const author = props.user;
+  const author = props.author;
+  const authorID = props.authorID;
   const currentUser = props.currentUser;
 
   const deleteNote = async function () {
     const response = await api.delete("/note", {
-      data: { noteID: id },
+      data: { noteID: id, authorID: authorID },
     });
     if (response.data.error) console.log(response.data.error);
     console.log(response.data.success);

@@ -263,7 +263,10 @@ app.post("/api/v1/note", (req, res) => {
 });
 
 app.delete("/api/v1/note", (req, res) => {
-  if (isLoggedIn(req)) {
+  const currentUserID = req.cookies.userID;
+  const authorID = req.body.authorID.toString();
+
+  if (isLoggedIn(req) && currentUserID === authorID) {
     const noteID = req.body.noteID;
     db.run("DELETE FROM notes WHERE id= (?)", [noteID], function (err) {
       if (err) res.status(500).json({ error: "Database error! Oh no!" });
