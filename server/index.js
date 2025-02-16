@@ -129,12 +129,24 @@ app.get("/api/v1/auth/status", async (req, res) => {
         }
       );
     });
-    const username = result[0].username;
-    res.json({
-      message: "Logged in successfully",
-      userID: userID,
-      username: username,
-    });
+    try {
+      const username = result[0].username;
+      res.json({
+        message: "Logged in successfully",
+        userID: userID,
+        username: username,
+      });
+    } catch {
+      //clear cookie if there is a cookie set with userID, but no corresponding user in DB
+      console.log("ayo?");
+      res.clearCookie("userID", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production" ? false : true,
+        sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
+        path: "/",
+      });
+      res.send("Cleared cookie for bad login status");
+    }
   } else {
     res.json({ message: "not logged on", userID: "" });
   }
@@ -178,7 +190,12 @@ app.post("/api/v1/logout", async function (req, res) {
   //check if user logged in
   if (isLoggedIn(req)) {
     //if logged in (check cookie), destroy the cookie!!!
-    res.clearCookie("userID", { path: "/" });
+    res.clearCookie("userID", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production" ? false : true,
+      sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
+      path: "/",
+    });
     //return message/status - you've logged out
     res.send("Logged out successfully");
   } else {
