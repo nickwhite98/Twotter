@@ -4,13 +4,6 @@ import { AuthContext } from "../AuthProvider.jsx";
 import deleteIcon from "../assets/delete-button.svg";
 import "../App.css";
 import api from "../api.jsx";
-import {
-  BrowserRouter as Router,
-  Routes,
-  useNavigate,
-  Route,
-  Link,
-} from "react-router-dom";
 
 function Home() {
   const { token } = useContext(AuthContext);

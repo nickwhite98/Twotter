@@ -1,17 +1,19 @@
 require("dotenv").config();
 const express = require("express");
-const session = require("express-session");
+const crypto = require("crypto");
 const app = express();
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 
-// API Endpoints - User create
-// Log in
-// Log out
-// UI For all dat
-// check existing endpoints, only allow if logged in
+// Change structure to pass session value back and forth on cookies instead of userID
+// Change login checks to query DB for session and find userID
+
+const generateToken = function () {
+  const token = crypto.randomBytes(32).toString("hex");
+  return token;
+};
 
 //Only need CORS in Development, Prod has same origin
 if (process.env.NODE_ENV === "development") {
@@ -40,7 +42,8 @@ db.run(
   `CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     username TEXT UNIQUE NOT NULL, 
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    token TEXT UNIQUE NOT NULL
   )`
 );
 //Create notes table
@@ -48,12 +51,20 @@ db.run(
   "CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, text TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id) )"
 );
 
-const isLoggedIn = function (req) {
-  if (req.cookies.userID) {
-    return true;
-  } else {
-    return false;
-  }
+const getLoggedInUserID = async function (req) {
+  const token = req.cookies.token;
+  const result = await new Promise((resolve, reject) => {
+    db.get("SELECT id FROM users WHERE token=(?)", [token], (err, row) => {
+      if (err) {
+        reject(err);
+      } else if (row) {
+        resolve(row.id);
+      } else {
+        resolve(null); //no user
+      }
+    });
+  });
+  return result;
 };
 
 const insertNote = function (db, text, userID) {
@@ -88,13 +99,13 @@ const getNotes = async function (db) {
 const getPassword = async function (username) {
   const result = await new Promise((resolve, reject) => {
     db.get(
-      "SELECT password, id FROM users WHERE username=(?)",
+      "SELECT password, token FROM users WHERE username=(?)",
       [username],
       (err, row) => {
         if (err) {
           reject(err);
         } else if (row) {
-          resolve({ password: row.password, id: row.id });
+          resolve({ password: row.password, token: row.token });
         } else {
           resolve(null); //no user
         }
@@ -106,39 +117,28 @@ const getPassword = async function (username) {
 
 //CHECK IF USER LOGGED IN
 app.get("/api/v1/auth/status", async (req, res) => {
-  const userID = req.cookies.userID;
-  if (isLoggedIn(req)) {
-    const result = await new Promise((resolve, reject) => {
-      db.all(
+  const userID = await getLoggedInUserID(req);
+
+  if (userID !== null) {
+    const username = await new Promise((resolve, reject) => {
+      db.get(
         "SELECT username FROM users WHERE id=(?)",
         [userID],
-        (err, rows) => {
+        (err, row) => {
           if (err) {
             reject(err);
           } else {
-            resolve(rows);
+            resolve(row.username);
           }
         }
       );
     });
-    try {
-      const username = result[0].username;
-      res.json({
-        message: "Logged in successfully",
-        userID: userID,
-        username: username,
-      });
-    } catch {
-      //clear cookie if there is a cookie set with userID, but no corresponding user in DB
-      console.log("ayo?");
-      res.clearCookie("userID", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production" ? false : true,
-        sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
-        path: "/",
-      });
-      res.send("Cleared cookie for bad login status");
-    }
+
+    res.json({
+      message: "Logged in successfully",
+      userID: userID,
+      username: username,
+    });
   } else {
     res.json({ message: "not logged on", userID: "" });
   }
@@ -157,9 +157,10 @@ app.post("/api/v1/login", async function (req, res) {
     }
     const storedPassword = userData?.password;
     const userID = userData.id;
+    const token = userData.token;
 
     if (password === storedPassword) {
-      res.cookie("userID", userID, {
+      res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production" ? false : true,
         sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
@@ -181,9 +182,10 @@ app.post("/api/v1/login", async function (req, res) {
 //LOGOUT
 app.post("/api/v1/logout", async function (req, res) {
   //check if user logged in
-  if (isLoggedIn(req)) {
+  const userID = await getLoggedInUserID(req);
+  if (userID !== null) {
     //if logged in (check cookie), destroy the cookie!!!
-    res.clearCookie("userID", {
+    res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? false : true,
       sameSite: process.env.NODE_ENV === "production" ? "Lax" : "None",
@@ -201,14 +203,15 @@ app.post("/api/v1/logout", async function (req, res) {
 app.post("/api/v1/user", async function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
-  console.log(username, password);
+  const token = generateToken();
   //inserting plaintext password is BAD
   db.run(
-    "INSERT INTO users (username, password) VALUES (?, ?)",
-    [username, password],
+    "INSERT INTO users (username, password, token) VALUES (?, ?, ?)",
+    [username, password, token],
     function (err) {
       if (err) {
         res.status(400).json({ error: err });
+        console.log(err);
         return;
       }
       res.status(201).json({ success: "user has entered the shack 😍" });
@@ -240,7 +243,8 @@ app.post("/api/v1/userexist", async function (req, res) {
 
 //GETS ALL NOTES
 app.get("/api/v1/notes", async function (req, res) {
-  if (isLoggedIn(req)) {
+  const userID = await getLoggedInUserID(req);
+  if (userID !== null) {
     try {
       const data = await getNotes(db);
       res.send(data);
@@ -253,10 +257,11 @@ app.get("/api/v1/notes", async function (req, res) {
 });
 
 //POSTS NEW NOTE
-app.post("/api/v1/note", (req, res) => {
-  if (isLoggedIn(req)) {
+app.post("/api/v1/note", async (req, res) => {
+  const userID = await getLoggedInUserID(req);
+
+  if (userID !== null) {
     const noteText = req.body.text;
-    const userID = req.cookies.userID;
     if (!noteText) {
       res.status(400).json({ error: "Text field is required" });
       return;
@@ -269,21 +274,25 @@ app.post("/api/v1/note", (req, res) => {
 });
 
 //DELETES NOTE
-app.delete("/api/v1/note", (req, res) => {
-  const currentUserID = req.cookies.userID;
-  const authorID = req.body.authorID.toString();
+app.delete("/api/v1/note", async (req, res) => {
+  const currentUserID = await getLoggedInUserID(req);
 
-  if (isLoggedIn(req) && currentUserID === authorID) {
+  if (currentUserID !== null) {
     const noteID = req.body.noteID;
-    db.run("DELETE FROM notes WHERE id= (?)", [noteID], function (err) {
-      if (err) res.status(500).json({ error: "Database error! Oh no!" });
-      if (this.changes === 0) {
-        res
-          .status(500)
-          .json({ error: "No record found with that id, nothing happened" });
+    db.run(
+      "DELETE FROM notes WHERE id= ? AND user_id = ?",
+      [noteID, currentUserID],
+      function (err) {
+        if (err) res.status(500).json({ error: "Database error! Oh no!" });
+        if (this.changes === 0) {
+          res
+            .status(400)
+            .json({ error: "No record found with that id, nothing happened" });
+        } else {
+          res.status(202).json({ success: `Note deleted with id ${noteID}` });
+        }
       }
-      res.status(202).json({ success: `Note deleted with id ${noteID}` });
-    });
+    );
   } else {
     res.status(400).send("Not logged in!");
   }

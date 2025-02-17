@@ -36,7 +36,7 @@ function SignUp() {
         username: username,
         password: password,
       });
-      console.log(response);
+
       if (response.data.success) {
         navigate("/login");
       }
