@@ -222,7 +222,6 @@ app.post("/api/v1/user", async function (req, res) {
 //CHECK IF USER EXISTS
 app.post("/api/v1/userexist", async function (req, res) {
   const username = req.body.username;
-  console.log(username);
   const result = await new Promise((resolve, reject) => {
     db.get(
       "SELECT username FROM users WHERE username=(?)",
