@@ -20,7 +20,11 @@ const AuthProvider = ({ children }) => {
     } else {
       setToken(token.data);
       const origin = location.pathname || "/";
-      navigate(origin);
+      if (origin === "/Login") {
+        navigate("/");
+      } else {
+        navigate(origin);
+      }
     }
   };
 
