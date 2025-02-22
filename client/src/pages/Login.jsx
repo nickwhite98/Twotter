@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { LoginForm } from "@/components/login-form";
 
 import {
   BrowserRouter as Router,
@@ -14,19 +15,14 @@ function Login() {
   const [loginFailMsg, setLoginFailMsg] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { onLogin } = useContext(AuthContext);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const loginResult = await onLogin(username, password);
-    if (!loginResult) {
-      setLoginFailMsg(
-        "Login attempt failed, please check username and password and try again"
-      );
-    }
-  };
 
   return (
     <>
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-sm">
+          <LoginForm />
+        </div>
+      </div>
       <h1>Login (PUBLIC)</h1>
       <form onSubmit={handleSubmit}>
         <div>
