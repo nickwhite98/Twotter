@@ -85,13 +85,17 @@ export function SignupForm({
     >
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
+          <CardTitle className="text-2xl text-left">Create Account</CardTitle>
+          <CardDescription className="text-left">
+            Create a username and password below to sign up
+          </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label>Username</Label>
+                <Label className="text-left">Username</Label>
                 <Input
                   type="text"
                   value={username}
@@ -102,7 +106,7 @@ export function SignupForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label className="text-left">Password</Label>
                 </div>
                 <Input
                   type="password"
@@ -112,7 +116,7 @@ export function SignupForm({
                   }}
                 />
                 <div className="flex items-center">
-                  <Label htmlFor="password">Re-enter Password</Label>
+                  <Label className="text-left">Re-enter Password</Label>
                 </div>
                 <Input
                   type="password"

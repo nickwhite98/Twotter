@@ -4,6 +4,15 @@ import { AuthContext } from "../AuthProvider.jsx";
 import deleteIcon from "../assets/delete-button.svg";
 import "../App.css";
 import api from "../api.jsx";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 function Home() {
   const { token } = useContext(AuthContext);
@@ -69,25 +78,27 @@ function Note(props) {
 
   if (currentUser === author) {
     return (
-      <div className="note">
-        <button
-          className="delete-button"
-          onClick={(e) => {
-            deleteNote();
-          }}
-        >
-          <img
-            src={deleteIcon}
-            className={"filter-white" + " " + "delete-icon"}
-          ></img>
-        </button>
-        <h3>{author} Says:</h3>
-
-        <p>{text}</p>
-        <p>
-          {timestamp} <br></br>id: {id}
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl text-left">{author}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-6">
+            <button
+              className="delete-button"
+              onClick={(e) => {
+                deleteNote();
+              }}
+            >
+              <img src={deleteIcon} className={"delete-icon"}></img>
+            </button>
+            <p>{text}</p>
+            <p>
+              {timestamp} <br></br>id: {id}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   } else {
     return (
@@ -121,19 +132,19 @@ function NoteInput(props) {
 
   return (
     <div>
-      <textarea
+      <Textarea
         value={noteInput}
         onChange={(e) => {
           setNoteInput(e.target.value);
         }}
       />
-      <button
+      <Button
         onClick={(e) => {
           postNote(noteInput);
         }}
       >
         Send Note
-      </button>
+      </Button>
     </div>
   );
 }

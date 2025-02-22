@@ -113,8 +113,3 @@
   line-height: 0; /* Remove extra inline spacing */
   background: none;
 }
-
-.filter-white {
-  filter: invert(94%) sepia(94%) saturate(23%) hue-rotate(2deg) brightness(107%)
-    contrast(105%);
-}

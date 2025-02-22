@@ -55,8 +55,8 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6 ", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl text-left">Login</CardTitle>
+          <CardDescription className="text-left">
             Enter your username below to login to your account
           </CardDescription>
         </CardHeader>
@@ -64,7 +64,9 @@ export function LoginForm({
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label>Username</Label>
+                <Label htmlFor="email" className="text-left">
+                  Username
+                </Label>
                 <Input
                   type="text"
                   value={username}
@@ -74,7 +76,9 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-left">
+                    Password
+                  </Label>
                   <a
                     href="#"
                     onClick={handleForgotPassword}
@@ -97,6 +101,7 @@ export function LoginForm({
               <Button type="submit" className="w-full">
                 Login
               </Button>
+              <p className="text-red-500">{loginFailMsg}</p>
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
