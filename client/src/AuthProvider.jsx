@@ -1,10 +1,10 @@
 import { createContext, useState, useEffect } from "react";
 import api from "./api.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
-
+// Manually specify the default value types for TypeScript
 const AuthContext = createContext({
   token: "",
-  onLogin: () => {},
+  onLogin: async (username, password) => false, // ✅ Default function returns Promise<boolean>
   onLogout: () => {},
 });
 
