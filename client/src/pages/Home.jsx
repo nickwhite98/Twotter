@@ -84,14 +84,13 @@ function Note(props) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
-            <button
-              className="delete-button"
+            <Button
               onClick={(e) => {
                 deleteNote();
               }}
             >
-              <img src={deleteIcon} className={"delete-icon"}></img>
-            </button>
+              Delete
+            </Button>
             <p>{text}</p>
             <p>
               {timestamp} <br></br>id: {id}
@@ -102,14 +101,19 @@ function Note(props) {
     );
   } else {
     return (
-      <div className="note">
-        <h3>{author} Says:</h3>
-
-        <p>{text}</p>
-        <p>
-          {timestamp} <br></br>id: {id}
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl text-left">{author}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-6">
+            <p>{text}</p>
+            <p>
+              {timestamp} <br></br>id: {id}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 }
