@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
-
+import { MoreVertical } from "lucide-react";
 import deleteIcon from "../assets/delete-button.svg";
 import "../App.css";
 import api from "../api.jsx";
@@ -11,8 +11,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 function Home() {
   const { token } = useContext(AuthContext);
@@ -76,46 +85,47 @@ function Note(props) {
     fetchNotes();
   };
 
-  if (currentUser === author) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl text-left">{author}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-6">
-            <Button
-              onClick={(e) => {
-                deleteNote();
-              }}
-            >
-              Delete
-            </Button>
-            <p>{text}</p>
-            <p>
-              {timestamp} <br></br>id: {id}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  } else {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl text-left">{author}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-6">
-            <p>{text}</p>
-            <p>
-              {timestamp} <br></br>id: {id}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  return (
+    <Card>
+      <CardHeader className="!flex-row !space-y-0 items-center justify-between p-6">
+        <CardTitle className="text-2xl text-left">{author}</CardTitle>
+
+        {currentUser === author && (
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <MoreVertical className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link
+                  to={`/account/${currentUser}`}
+                  className="w-full no-underline text-inherit"
+                >
+                  Account
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  deleteNote();
+                }}
+              >
+                Delete Note
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </CardHeader>
+
+      <CardContent>
+        <div className="flex flex-col gap-6">
+          <p>{text}</p>
+          <p>
+            {timestamp} <br></br>id: {id}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 function NoteInput(props) {
