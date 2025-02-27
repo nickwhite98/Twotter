@@ -27,11 +27,11 @@ jobs:
             git pull origin main
 
             cd client
-            echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env.production
+            echo 'VITE_API_URL=https://3.16.68.73:3000/api/v1' > .env.production
             npm install
             npm run build -- --mode production
 
-            echo 'VITE_API_URL=http://3.16.68.73:3000/api/v1' > .env
+            echo 'VITE_API_URL=https://3.16.68.73:3000/api/v1' > .env
 
 
             # Install dependencies for server
