@@ -68,7 +68,7 @@ const Navigation = (props) => {
           >
             <img src={flappy} alt="Twotter logo" className="h-8 w-8" />
           </a>
-          <h1 className="text-white font-bold ml-2">Two-tter</h1>
+          <h1 className="text-white text-2xl font-bold ml-2">Scoopty</h1>
         </div>
         {/* Right side: navigation links */}
         <div className="ml-auto">
