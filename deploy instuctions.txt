@@ -1,0 +1,4 @@
+1. Generate drizzle migration file
+    run "npx drizzle-kit generate" in server directory locally
+
+2. Push to github as usual

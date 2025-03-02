@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "server/dist/"
-          target: "~/Twotter/server/dist/"
+          target: "~/Twotter/"
 
       - name: Deploy to EC2
         env:
