@@ -1,2 +1,13 @@
 Docker tutorial Cam recommended: https://youtu.be/0gCRw13C2Xw
 
+Don't FUCK up PROD!!!!
+
+1. Install Drizzle-kit
+2. Install TS
+3. Install pm2 ts support
+3. Add commands to our deploy.yml to drizzle-kit generate and migrate
+4. Actually compile TS
+5. Update start server commands to point at the build JS files (already done)
+
+
+

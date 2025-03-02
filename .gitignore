@@ -25,4 +25,5 @@ client/dist-ssr
 *.sw?
 
 server/datafuckshack.db
+server/dist/
 .env*
