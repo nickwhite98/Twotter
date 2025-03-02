@@ -22,6 +22,7 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
+        working-directory: ./Twotter/server
         run: npm ci
 
       - name: Build Typescript
