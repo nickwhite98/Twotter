@@ -22,11 +22,11 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        working-directory: ./Twotter/server
+        working-directory: ./server
         run: npm ci
 
       - name: Build Typescript
-        working-directory: ./Twotter/server
+        working-directory: ./server
         run: npm run build
 
       - name: Copy built tsc files via SCP
