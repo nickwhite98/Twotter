@@ -6,11 +6,24 @@ const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const multer = require("multer");
+const upload = multer({ dest: "assets/avatars" });
 
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/libsql";
 import { usersTable, notesTable } from "./src/db/schema";
-import { eq, lt, gte, ne } from "drizzle-orm";
+import { eq, lt, gte, ne, InferInsertModel } from "drizzle-orm";
+
+import { timestamp } from "drizzle-orm/gel-core";
+
+// Types:
+type NoteInsert = InferInsertModel<typeof notesTable>;
+type UserUpdate = {
+  username?: string;
+  password?: string;
+  token?: string;
+  avatarPath?: string;
+};
 
 const db2 = drizzle(process.env.DB_FILE_NAME!);
 const db = new sqlite3.Database("./datafuckshack.db");
@@ -22,7 +35,22 @@ const generateToken = function () {
   return token;
 };
 
-//Only need CORS in Development, Prod has same origi
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "assets/avatars/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
+  },
+});
+
+const uploadAvatar = multer({ storage: avatarStorage });
+
+//Only need CORS in Development, Prod has same origin
 if (process.env.NODE_ENV === "development") {
   app.use(
     cors({
@@ -40,6 +68,7 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use(express.json());
 app.use(cookieParser());
+app.use("/api/v1/avatars", express.static("assets/avatars"));
 //could use middleware to make the check logged in shit easier
 
 const getLoggedInUserID = async function (req) {
@@ -52,54 +81,15 @@ const getLoggedInUserID = async function (req) {
   return result[0].id;
 };
 
-const insertNote = function (db, text, userID) {
-  console.log(userID);
-  db.run(
-    "INSERT INTO notes (text, user_id) VALUES (?, ?)",
-    [text, userID],
-    function (err) {
-      if (err) return console.error(err.message);
-      console.log(`A row has been inserted!!!! with rowid ${this.lastID}`);
-    }
-  );
-};
-
-const getNotes = async function (db) {
-  const result = await new Promise((resolve, reject) => {
-    db.all(
-      "SELECT notes.id AS note_id, notes.text, notes.timestamp, notes.user_id, users.id AS user_id, users.username FROM notes JOIN users ON notes.user_id = users.id",
-      [],
-      (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
-      }
-    );
-  });
-  return result;
-};
-
 const getPassword = async function (username) {
-  const result: { password: string; token: string } = await new Promise(
-    (resolve, reject) => {
-      db.get(
-        "SELECT password, token FROM users WHERE username=(?)",
-        [username],
-        (err, row) => {
-          if (err) {
-            reject(err);
-          } else if (row) {
-            resolve({ password: row.password, token: row.token });
-          } else {
-            resolve(null); //no user
-          }
-        }
-      );
-    }
-  );
-  return result;
+  const result = await db2
+    .select({
+      password: usersTable.password,
+      token: usersTable.token,
+    })
+    .from(usersTable)
+    .where(eq(username, usersTable.username));
+  return result[0];
 };
 
 //CHECK IF USER LOGGED IN
@@ -225,12 +215,43 @@ app.post("/api/v1/userexist", async function (req, res) {
   res.status(200).json({ userExist: result });
 });
 
+//POST AVATAR PIC
+app.post("/api/v1/avatar", uploadAvatar.single("file"), async (req, res) => {
+  const userID = await getLoggedInUserID(req);
+  const avatarFile = req.file;
+  const filePath = `/avatars/${avatarFile.filename}`;
+  await db2
+    .update(usersTable)
+    .set({ avatarPath: filePath } as any)
+    .where(eq(usersTable.id, userID));
+  res.json({ message: "File uploaded successfully", filePath: filePath });
+});
+
+app.get("/api/v1/avatar", async (req, res) => {
+  const userID = await getLoggedInUserID(req);
+  const avatarPath = await db2
+    .select({ avatarPath: usersTable.avatarPath })
+    .from(usersTable)
+    .where(eq(usersTable.id, userID));
+  res.json(avatarPath);
+});
+
 //GETS ALL NOTES
 app.get("/api/v1/notes", async function (req, res) {
   const userID = await getLoggedInUserID(req);
   if (userID !== null) {
     try {
-      const data = await getNotes(db);
+      const data = await db2
+        .select({
+          id: notesTable.id,
+          text: notesTable.text,
+          timestamp: notesTable.timestamp,
+          user_id: notesTable.user_id,
+          username: usersTable.username,
+        })
+        .from(notesTable)
+        .leftJoin(usersTable, eq(notesTable.user_id, usersTable.id));
+
       res.send(data);
     } catch (error) {
       res.status(500).send("error fetching data");
@@ -250,7 +271,9 @@ app.post("/api/v1/note", async (req, res) => {
       res.status(400).json({ error: "Text field is required" });
       return;
     }
-    insertNote(db, noteText, userID);
+    const result = await db2
+      .insert(notesTable)
+      .values({ text: noteText, user_id: userID } as NoteInsert);
     res.status(201).json({ success: "Note entered to DB" });
   } else {
     res.status(400).send("Not logged in!");

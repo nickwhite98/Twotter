@@ -7,6 +7,7 @@ export const usersTable = sqliteTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   token: text("token").unique().notNull(),
+  avatarPath: text("avatarPath").default(null),
 });
 
 export const notesTable = sqliteTable("notes", {

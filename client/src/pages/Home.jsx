@@ -51,8 +51,8 @@ function Home() {
                 return (
                   <Note
                     fetchNotes={fetchNotes}
-                    key={note.note_id}
-                    id={note.note_id}
+                    key={note.id}
+                    id={note.id}
                     text={note.text}
                     timestamp={note.timestamp}
                     author={note.username}

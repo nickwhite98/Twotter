@@ -1,4 +1,15 @@
 Docker tutorial Cam recommended: https://youtu.be/0gCRw13C2Xw
 
+Avatars: 
+DONE - 1. Update users table schema to store avatar path
+In prog - 1.5: image upload UI/functionality
+2. API endpoint - post avatar 
+    + receive image data from post body
+    + write to file in sever/assets/avatars
+    + capture that filepath
+    + store file path in users table
+    
+3. store avatar pics in server/assets/avatars
+3. update UI to include avatars and upload photo
 
 

@@ -26,4 +26,5 @@ client/dist-ssr
 
 server/datafuckshack.db
 server/dist/
+server/assets/
 .env*

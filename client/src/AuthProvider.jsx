@@ -14,11 +14,11 @@ const AuthProvider = ({ children }) => {
   const location = useLocation();
 
   const checkIfLoggedIn = async function () {
-    const token = await api.get("/auth/status");
-    if (token.data.userID === "") {
+    const response = await api.get("/auth/status");
+    if (response.data.userID === "") {
       setToken("");
     } else {
-      setToken(token.data);
+      setToken(response.data);
       const origin = location.pathname || "/";
       if (origin === "/Login") {
         navigate("/");
