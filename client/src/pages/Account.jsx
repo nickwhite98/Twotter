@@ -4,6 +4,8 @@ import "../App.css";
 import api from "../api.jsx";
 import { useParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MdEdit } from "react-icons/md";
+import { Button } from "@/components/ui/button.js";
 const apiURL = import.meta.env.VITE_API_URL;
 
 function Account() {
@@ -50,6 +52,8 @@ function Account() {
           <AvatarFallback></AvatarFallback>
         </Avatar>
         <h1>User Page for {username}</h1>
+
+        <MdEdit className="transform scale-150" />
       </div>
 
       <button type="button" onClick={onLogout}>

@@ -70,32 +70,58 @@ const Navigation = (props) => {
           </a>
           <h1 className="text-white text-2xl font-bold ml-2">Scoopty</h1>
         </div>
+
         {/* Right side: navigation links */}
         <div className="ml-auto">
-          <NavigationMenuList className="!flex-none !justify-end space-x-4">
-            {token && (
-              <Link to="/" className="text-white hover:underline">
-                Home
-              </Link>
-            )}
-            {token && (
-              <Link
-                to={`/account/${token.username}`}
-                className="text-white hover:underline"
-              >
-                Account
-              </Link>
-            )}
-            {!token && (
-              <Link to="/login" className="text-white hover:underline">
-                Login
-              </Link>
-            )}
-            {!token && (
-              <Link to="/signup" className="text-white hover:underline">
-                Sign Up
-              </Link>
-            )}
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              {token && (
+                <NavigationMenuLink asChild>
+                  <Link to="/" className="text-white hover:underline px-4 py-2">
+                    Home
+                  </Link>
+                </NavigationMenuLink>
+              )}
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              {token && (
+                <NavigationMenuLink asChild>
+                  <Link
+                    to={`/account/${token.username}`}
+                    className="text-white hover:underline px-4 py-2"
+                  >
+                    Account
+                  </Link>
+                </NavigationMenuLink>
+              )}
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              {!token && (
+                <NavigationMenuLink asChild>
+                  <Link
+                    to="/login"
+                    className="text-white hover:underline px-4 py-2"
+                  >
+                    Login
+                  </Link>
+                </NavigationMenuLink>
+              )}
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              {!token && (
+                <NavigationMenuLink asChild>
+                  <Link
+                    to="/signup"
+                    className="text-white hover:underline px-4 py-2"
+                  >
+                    Sign Up
+                  </Link>
+                </NavigationMenuLink>
+              )}
+            </NavigationMenuItem>
           </NavigationMenuList>
         </div>
       </div>
@@ -104,13 +130,3 @@ const Navigation = (props) => {
 };
 
 export default App;
-
-// make default routing work in a good way
-// Add some more routes, have one of them be dynamic
-// add stuff
-// git workflows/pr reviews
-// auto deploy
-// make shit pretty
-// outsource security??????
-// redux
-// tests

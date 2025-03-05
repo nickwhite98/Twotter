@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
 import { MoreVertical } from "lucide-react";
-import deleteIcon from "../assets/delete-button.svg";
 import "../App.css";
 import api from "../api.jsx";
 import {
@@ -19,6 +18,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -146,19 +156,33 @@ function NoteInput(props) {
 
   return (
     <div>
-      <Textarea
-        value={noteInput}
-        onChange={(e) => {
-          setNoteInput(e.target.value);
-        }}
-      />
-      <Button
-        onClick={(e) => {
-          postNote(noteInput);
-        }}
-      >
-        Send Note
-      </Button>
+      <Drawer>
+        <DrawerTrigger>Create Post</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <Textarea
+              value={noteInput}
+              onChange={(e) => {
+                setNoteInput(e.target.value);
+              }}
+            />
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose>
+              <Button
+                onClick={(e) => {
+                  postNote(noteInput);
+                }}
+              >
+                Send Note
+              </Button>
+            </DrawerClose>
+            <DrawerClose>
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
