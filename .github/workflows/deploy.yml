@@ -60,7 +60,7 @@ jobs:
             # Install dependencies for server
             cd ../server
             echo 'NODE_ENV=production' > .env
-            echo 'DB_FILE_NAME=${{ secrets.DB_FILE_NAME }}' > .env
+            echo 'DB_FILE_NAME=${{ secrets.DB_FILE_NAME }}' >> .env
             npm install
 
             # DB Migrations
