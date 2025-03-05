@@ -7,7 +7,6 @@ const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
-const upload = multer({ dest: "assets/avatars" });
 
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/libsql";
@@ -144,7 +143,7 @@ app.post("/api/v1/login", async function (req, res) {
     }
   } catch (error) {
     console.log("login error", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error });
   }
 });
 
