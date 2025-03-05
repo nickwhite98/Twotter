@@ -302,14 +302,14 @@ app.delete("/api/v1/note", async (req, res) => {
 
 if (process.env.NODE_ENV === "production") {
   //serve React frontend
-  app.use(express.static(path.join(__dirname, "public")));
+  app.use(express.static(path.join(__dirname, "../public")));
 
   app.get("*", (req, res) => {
     if (req.path.startsWith("/api")) {
       // Let the request be handled by other routes
       return;
     }
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "../public", "index.html"));
   });
 }
 
