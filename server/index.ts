@@ -18,12 +18,6 @@ import { timestamp } from "drizzle-orm/gel-core";
 
 // Types:
 type NoteInsert = InferInsertModel<typeof notesTable>;
-type UserUpdate = {
-  username?: string;
-  password?: string;
-  token?: string;
-  avatarPath?: string;
-};
 
 const db2 = drizzle(process.env.DB_FILE_NAME!);
 const db = new sqlite3.Database("./datafuckshack.db");
@@ -217,6 +211,7 @@ app.post("/api/v1/userexist", async function (req, res) {
 
 //POST AVATAR PIC
 app.post("/api/v1/avatar", uploadAvatar.single("file"), async (req, res) => {
+  console.log("I RAN");
   const userID = await getLoggedInUserID(req);
   const avatarFile = req.file;
   const filePath = `/avatars/${avatarFile.filename}`;
