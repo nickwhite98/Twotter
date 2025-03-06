@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `bio` text DEFAULT 'I haven''t set my bio yet!';

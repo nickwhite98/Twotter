@@ -210,7 +210,6 @@ app.post("/api/v1/userexist", async function (req, res) {
 
 //POST AVATAR PIC
 app.post("/api/v1/avatar", uploadAvatar.single("file"), async (req, res) => {
-  console.log("I RAN");
   const userID = await getLoggedInUserID(req);
   const avatarFile = req.file;
   const filePath = `/avatars/${avatarFile.filename}`;
@@ -228,6 +227,16 @@ app.get("/api/v1/avatar", async (req, res) => {
     .from(usersTable)
     .where(eq(usersTable.id, userID));
   res.json(avatarPath);
+});
+
+app.get("/api/v1/bio", async (req, res) => {
+  const userID = await getLoggedInUserID(req);
+  db2.select();
+  const result = await db2
+    .select({ bio: usersTable.bio })
+    .from(usersTable)
+    .where(eq(usersTable.id, userID));
+  res.json(result);
 });
 
 //GETS ALL NOTES

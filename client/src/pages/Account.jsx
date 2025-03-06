@@ -15,6 +15,7 @@ function Account() {
 
   const [avatarFile, setAvatarFile] = useState();
   const [avatarFilePath, setAvatarFilePath] = useState();
+  const [bio, setBio] = useState();
 
   const handleUpload = async function () {
     console.log(avatarFile);
@@ -33,9 +34,14 @@ function Account() {
     const response = await api.get("/avatar");
     setAvatarFilePath(response.data[0].avatarPath);
   };
+  const getBio = async function () {
+    const response = await api.get("/bio");
+    setBio(response.data[0].bio);
+  };
 
   useEffect(() => {
     getAvatar();
+    getBio();
   }, []);
 
   const handleFileChange = function (e) {
@@ -52,6 +58,7 @@ function Account() {
           <AvatarFallback></AvatarFallback>
         </Avatar>
         <h1>User Page for {username}</h1>
+        {bio && <p>{bio}</p>}
 
         <MdEdit className="transform scale-150" />
       </div>

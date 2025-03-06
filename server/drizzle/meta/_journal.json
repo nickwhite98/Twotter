@@ -29,6 +29,13 @@
       "when": 1741053568155,
       "tag": "0003_dear_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1741225413471,
+      "tag": "0004_new_harrier",
+      "breakpoints": true
     }
   ]
 }
