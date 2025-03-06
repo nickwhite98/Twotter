@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
 import { MoreVertical } from "lucide-react";
+import AvatarManager from "../components/AvatarManager.jsx";
 import "../App.css";
 import api from "../api.jsx";
 import {
@@ -98,6 +99,7 @@ function Note(props) {
   return (
     <Card>
       <CardHeader className="!flex-row !space-y-0 items-center justify-between p-6">
+        {authorID && <AvatarManager userID={authorID} />}
         <CardTitle className="text-2xl text-left">{author}</CardTitle>
 
         {currentUser === author && (
@@ -128,10 +130,8 @@ function Note(props) {
 
       <CardContent>
         <div className="flex flex-col gap-6">
-          <p>{text}</p>
-          <p>
-            {timestamp} <br></br>id: {id}
-          </p>
+          <p className="break-words overflow-hidden">{text}</p>
+          <p>{timestamp}</p>
         </div>
       </CardContent>
     </Card>

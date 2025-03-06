@@ -220,8 +220,8 @@ app.post("/api/v1/avatar", uploadAvatar.single("file"), async (req, res) => {
   res.json({ message: "File uploaded successfully", filePath: filePath });
 });
 
-app.get("/api/v1/avatar", async (req, res) => {
-  const userID = await getLoggedInUserID(req);
+app.get("/api/v1/avatar/:userID", async (req, res) => {
+  const userID = Number(req.params.userID);
   const avatarPath = await db2
     .select({ avatarPath: usersTable.avatarPath })
     .from(usersTable)

@@ -10,6 +10,7 @@ const AuthContext = createContext({
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState("");
+  const [userID, setUserID] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 

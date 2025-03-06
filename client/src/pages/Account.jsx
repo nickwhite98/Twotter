@@ -1,24 +1,25 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
+import AvatarManager from "../components/AvatarManager.jsx";
 import "../App.css";
 import api from "../api.jsx";
 import { useParams } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { MdEdit } from "react-icons/md";
 import { Button } from "@/components/ui/button.js";
 const apiURL = import.meta.env.VITE_API_URL;
 
 function Account() {
   const { token } = useContext(AuthContext);
+  const userID = token.userID;
   const { username } = useParams();
   const { onLogout } = useContext(AuthContext);
-
   const [avatarFile, setAvatarFile] = useState();
-  const [avatarFilePath, setAvatarFilePath] = useState();
+
   const [bio, setBio] = useState();
 
   const handleUpload = async function () {
-    console.log(avatarFile);
+    console.log(token);
     const formData = new FormData();
     formData.append("file", avatarFile);
 
@@ -27,20 +28,14 @@ function Account() {
         "Content-Type": "multipart/form-data",
       },
     });
-    setAvatarFilePath(response.data.filePath);
   };
 
-  const getAvatar = async function () {
-    const response = await api.get("/avatar");
-    setAvatarFilePath(response.data[0].avatarPath);
-  };
   const getBio = async function () {
     const response = await api.get("/bio");
     setBio(response.data[0].bio);
   };
 
   useEffect(() => {
-    getAvatar();
     getBio();
   }, []);
 
@@ -53,13 +48,9 @@ function Account() {
   return (
     <>
       <div className="flex items-center gap-4">
-        <Avatar>
-          {avatarFilePath && <AvatarImage src={`${apiURL}${avatarFilePath}`} />}
-          <AvatarFallback></AvatarFallback>
-        </Avatar>
         <h1>User Page for {username}</h1>
         {bio && <p>{bio}</p>}
-
+        <AvatarManager userID={userID} />
         <MdEdit className="transform scale-150" />
       </div>
 
