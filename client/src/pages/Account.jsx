@@ -48,7 +48,7 @@ function Account() {
     <>
       <div className="flex items-center gap-4">
         <Avatar>
-          <AvatarImage src={`${apiURL}${avatarFilePath}`} />
+          {avatarFilePath && <AvatarImage src={`${apiURL}${avatarFilePath}`} />}
           <AvatarFallback></AvatarFallback>
         </Avatar>
         <h1>User Page for {username}</h1>

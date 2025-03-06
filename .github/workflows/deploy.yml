@@ -64,7 +64,7 @@ jobs:
             npm install
 
             # DB Migrations
-            npx drizzle-kit migrate up
+            npx drizzle-kit migrate
 
             # Ensure frontend directory exists inside server (for serving static files)
             mkdir -p ~/Twotter/server/public
