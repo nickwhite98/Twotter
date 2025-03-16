@@ -13,3 +13,10 @@ In prog - 1.5: image upload UI/functionality
 3. update UI to include avatars and upload photo
 
 
+Replies: 
+1. Add ability to post a reply to a reply. 
+2. Frontend reply component needs to use that
+3. Fetch replies to a reply, update reply component to use that
+4. update reply component to fetch it's children
+5. add reply prop called depth. When rendering a reply from a note, depth = 0 
+6. why replying to a reply, it passes myDepth + 1 as depth prop

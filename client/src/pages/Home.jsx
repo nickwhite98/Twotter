@@ -69,6 +69,7 @@ function Home() {
                     author={note.username}
                     authorID={note.user_id}
                     currentUser={username}
+                    isReply={false}
                   ></Note>
                 );
               })}
@@ -86,6 +87,13 @@ function Note(props) {
   const author = props.author;
   const authorID = props.authorID;
   const currentUser = props.currentUser;
+  const isReply = props.isReply;
+
+  const { token } = useContext(AuthContext);
+  const userID = token.userID;
+  const username = token.username;
+
+  const [replies, setReplies] = useState([]);
 
   const deleteNote = async function () {
     const response = await api.delete("/note", {
@@ -96,11 +104,28 @@ function Note(props) {
     fetchNotes();
   };
 
+  const fetchReplies = async function () {
+    const response = await api.get(`/replies/${id}`);
+    setReplies(response.data);
+  };
+
+  useEffect(() => {
+    fetchReplies();
+  }, []);
+
   return (
     <Card>
       <CardHeader className="!flex-row !space-y-0 items-center justify-between p-6">
         {authorID && <AvatarManager userID={authorID} />}
         <CardTitle className="text-2xl text-left">{author}</CardTitle>
+
+        {/*Reply Button */}
+        {!isReply && (
+          <ReplyInput
+            fetchReplies={fetchReplies}
+            parentNote={{ id, text, timestamp, author, authorID }}
+          />
+        )}
 
         {currentUser === author && (
           <DropdownMenu>
@@ -132,9 +157,107 @@ function Note(props) {
         <div className="flex flex-col gap-6">
           <p className="break-words overflow-hidden">{text}</p>
           <p>{timestamp}</p>
+          {replies &&
+            replies.slice().map((reply) => {
+              return (
+                <Reply
+                  key={reply.id}
+                  id={reply.id}
+                  text={reply.text}
+                  timestamp={reply.timestamp}
+                  author={reply.username}
+                  authorID={reply.user_id}
+                  currentUser={username}
+                ></Reply>
+              );
+            })}
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function Reply(props) {
+  const id = props.id;
+  const text = props.text;
+  const timestamp = props.timestamp;
+  const author = props.author;
+  const authorID = props.authorID;
+  const currentUser = props.currentUser;
+
+  return (
+    <Card>
+      <CardHeader className="!flex-row !space-y-0 items-center justify-between p-6">
+        {authorID && <AvatarManager userID={authorID} />}
+        <CardTitle className="text-2xl text-left">{author}</CardTitle>
+        {/*Reply Button */}
+        <ReplyInput parentNote={{ id, text, timestamp, author, authorID }} />
+      </CardHeader>
+
+      <CardContent>
+        <div className="flex flex-col gap-6">
+          <p className="break-words overflow-hidden">{text}</p>
+          <p>{timestamp}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ReplyInput(props) {
+  const [replyInput, setReplyInput] = useState("");
+  const fetchReplies = props.fetchReplies;
+  const parentNoteID = props.parentNote.id;
+  const parentText = props.parentNote.text;
+  const parentTimestamp = props.parentNote.timestamp;
+  const parentAuthor = props.parentNote.author;
+  const parentAuthorID = props.parentNote.authorID;
+
+  const postReply = async function () {
+    const response = await api.post("/reply", {
+      data: { parentNoteID: parentNoteID, text: replyInput },
+    });
+    setReplyInput("");
+    fetchReplies();
+  };
+
+  return (
+    <Drawer>
+      <DrawerTrigger>Reply</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="flex flex-col items-center justify-center">
+          <Note
+            key={parentNoteID}
+            id={parentNoteID}
+            text={parentText}
+            timestamp={parentTimestamp}
+            author={parentAuthor}
+            authorID={parentAuthorID}
+            isReply={true}
+          ></Note>
+          <Textarea
+            value={replyInput}
+            onChange={(e) => {
+              setReplyInput(e.target.value);
+            }}
+          />
+        </DrawerHeader>
+        <DrawerFooter>
+          <DrawerClose>
+            <Button
+              onClick={(e) => {
+                postReply();
+              }}
+            >
+              Send
+            </Button>
+          </DrawerClose>
+          <DrawerClose>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

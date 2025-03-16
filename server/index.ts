@@ -10,13 +10,14 @@ const multer = require("multer");
 
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/libsql";
-import { usersTable, notesTable } from "./src/db/schema";
-import { eq, lt, gte, ne, InferInsertModel } from "drizzle-orm";
+import { usersTable, notesTable, repliesTable } from "./src/db/schema";
+import { isNull, and, eq, lt, gte, ne, InferInsertModel } from "drizzle-orm";
 
 import { timestamp } from "drizzle-orm/gel-core";
 
 // Types:
 type NoteInsert = InferInsertModel<typeof notesTable>;
+type ReplyInsert = InferInsertModel<typeof repliesTable>;
 
 const db2 = drizzle(process.env.DB_FILE_NAME!);
 const db = new sqlite3.Database("./datafuckshack.db");
@@ -220,6 +221,7 @@ app.post("/api/v1/avatar", uploadAvatar.single("file"), async (req, res) => {
   res.json({ message: "File uploaded successfully", filePath: filePath });
 });
 
+//GET Avatar path
 app.get("/api/v1/avatar/:userID", async (req, res) => {
   const userID = Number(req.params.userID);
   const avatarPath = await db2
@@ -229,6 +231,7 @@ app.get("/api/v1/avatar/:userID", async (req, res) => {
   res.json(avatarPath);
 });
 
+//Get Bio
 app.get("/api/v1/bio", async (req, res) => {
   const userID = await getLoggedInUserID(req);
   db2.select();
@@ -278,6 +281,64 @@ app.post("/api/v1/note", async (req, res) => {
       .insert(notesTable)
       .values({ text: noteText, user_id: userID } as NoteInsert);
     res.status(201).json({ success: "Note entered to DB" });
+  } else {
+    res.status(400).send("Not logged in!");
+  }
+});
+
+//GET Replies
+app.get("/api/v1/replies/:parentNoteID", async (req, res) => {
+  const parentNoteID = Number(req.params.parentNoteID);
+
+  const userID = await getLoggedInUserID(req);
+  if (userID !== null) {
+    try {
+      const data = await db2
+        .select({
+          id: repliesTable.id,
+          text: repliesTable.text,
+          timestamp: repliesTable.timestamp,
+          user_id: repliesTable.user_id,
+          username: usersTable.username,
+        })
+        .from(repliesTable)
+        .leftJoin(usersTable, eq(repliesTable.user_id, usersTable.id))
+        .where(
+          and(
+            eq(repliesTable.parent_note_id, parentNoteID),
+            isNull(repliesTable.parent_reply_id)
+          )
+        );
+
+      res.send(data);
+    } catch (error) {
+      res.status(500).send("error fetching data");
+    }
+  } else {
+    res.status(400).send("Not logged in!");
+  }
+});
+
+//POST Reply
+app.post("/api/v1/reply", async (req, res) => {
+  const userID = await getLoggedInUserID(req);
+  console.log(req.body.data);
+
+  if (userID !== null) {
+    const replyText = req.body.data.text;
+    const parentNoteID = req.body.data.parentNoteID;
+    if (!replyText) {
+      res.status(400).json({ error: "Text field is required" });
+      return;
+    }
+    const result = await db2.insert(repliesTable).values({
+      text: replyText,
+      user_id: userID,
+      parent_note_id: parentNoteID,
+    } as ReplyInsert);
+    res
+      .status(201)
+      .json({ success: `Reply entered to DB with parentID: ${parentNoteID}` });
   } else {
     res.status(400).send("Not logged in!");
   }
