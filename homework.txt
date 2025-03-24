@@ -12,7 +12,7 @@ In prog - 1.5: image upload UI/functionality
 3. store avatar pics in server/assets/avatars
 3. update UI to include avatars and upload photo
 
-
+----------------------------------------------------------------------
 Replies: 
 1. Add ability to post a reply to a reply. 
 2. Frontend reply component needs to use that
@@ -20,3 +20,30 @@ Replies:
 4. update reply component to fetch it's children
 5. add reply prop called depth. When rendering a reply from a note, depth = 0 
 6. why replying to a reply, it passes myDepth + 1 as depth prop
+
+----------------------------------------------------------------------
+Concepts we haven't touched yet: 
+1. Monoliths are coming back baby!!!!
+2. We need to talk about 'the cloud'
+3. Common cloud concepts: Compute layer could be lambda (Server function) - an abstracted away cloud concept. You don't need to deploy or maintain a server, you just define a cloud function. You create a function, and I give it some code, and invoke that function with an HTTP endpoint or something, and it will just scale forever into infinity. You pay per milisecond of execution time
+    Downside - cold start issues. 
+    Upside - generous free tiers, can scale to nothing/infinity as needed
+
+Bucket - where you store static files - source code, images, etc. 
+    Abstracted away in AWS land, don't need to worry about provisioning computers, etc. on it. They'll give endpoints to upload/download. Paying monthly rate based on storage and reads/writes
+
+NoSQL database - Dynamo is Amazon's
+    Class of database that are key value pair databases. Use them like a dictionary in python
+        Pros: 
+            If you adopt the constraints, you can scale to infinity or 0. 
+            Hammer it with reads/writes/infinite data and don't need to think about server replication etc. etc. 
+            People use dynamo very incorrectly.
+        Cons:
+            Limited access patterns, meaning your design of how you put stuff in there matters a lot
+
+Infrastucture as Code: 
+    Cloud stuff is 'event driven' - each time something is uploaded to a bucket, run a lambda function, etc. 
+    This will drive a lot of complexity. 
+    In the same way that we have code that defines database schemas, there is code that defines infrastructure. 
+        Code to be run by a tool, then creates lambas, buckets, the connections, etc. 
+

@@ -4,6 +4,7 @@ import { MoreVertical } from "lucide-react";
 import AvatarManager from "../components/AvatarManager.jsx";
 import "../App.css";
 import api from "../api.jsx";
+import { format } from "date-fns";
 import {
   Card,
   CardContent,
@@ -11,6 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,7 +76,6 @@ function Home() {
                     author={note.username}
                     authorID={note.user_id}
                     currentUser={username}
-                    isReply={false}
                   ></Note>
                 );
               })}
@@ -83,11 +89,10 @@ function Note(props) {
   const fetchNotes = props.fetchNotes;
   const id = props.id;
   const text = props.text;
-  const timestamp = props.timestamp;
+  const timestamp = format(new Date(props.timestamp), "MMM d, h:mm a");
   const author = props.author;
   const authorID = props.authorID;
   const currentUser = props.currentUser;
-  const isReply = props.isReply;
 
   const { token } = useContext(AuthContext);
   const userID = token.userID;
@@ -120,12 +125,10 @@ function Note(props) {
         <CardTitle className="text-2xl text-left">{author}</CardTitle>
 
         {/*Reply Button */}
-        {!isReply && (
-          <ReplyInput
-            fetchReplies={fetchReplies}
-            parentNote={{ id, text, timestamp, author, authorID }}
-          />
-        )}
+        <ParentReplyInput
+          fetchReplies={fetchReplies}
+          parentNote={{ id, text, timestamp, author, authorID }}
+        />
 
         {currentUser === author && (
           <DropdownMenu>
@@ -157,54 +160,103 @@ function Note(props) {
         <div className="flex flex-col gap-6">
           <p className="break-words overflow-hidden">{text}</p>
           <p>{timestamp}</p>
-          {replies &&
-            replies.slice().map((reply) => {
-              return (
-                <Reply
-                  key={reply.id}
-                  id={reply.id}
-                  text={reply.text}
-                  timestamp={reply.timestamp}
-                  author={reply.username}
-                  authorID={reply.user_id}
-                  currentUser={username}
-                ></Reply>
-              );
-            })}
+          <Collapsible>
+            <CollapsibleTrigger>Comments</CollapsibleTrigger>
+            <CollapsibleContent>
+              {replies &&
+                replies.map((reply) => {
+                  return (
+                    <Comment
+                      key={reply.id}
+                      id={reply.id}
+                      text={reply.text}
+                      timestamp={reply.timestamp}
+                      author={reply.username}
+                      authorID={reply.user_id}
+                      parentNoteID={reply.parent_note_id}
+                      parentReplyID={reply.parent_reply_id}
+                    />
+                  );
+                })}
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-function Reply(props) {
+function Comment(props) {
   const id = props.id;
   const text = props.text;
   const timestamp = props.timestamp;
   const author = props.author;
   const authorID = props.authorID;
   const currentUser = props.currentUser;
+  const parentReplyID = props.parentReplyID;
+  const parentNoteID = props.parentNoteID;
+  const [showReplyInput, setShowReplyInput] = useState(false);
+
+  return (
+    <div>
+      <Card>
+        <CardHeader className="!flex-row !space-y-0 items-center justify-between p-6">
+          {authorID && <AvatarManager userID={authorID} />}
+          <CardTitle className="text-2xl text-left">{author}</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <div className="flex flex-col gap-6">
+            <p className="break-words overflow-hidden">{text}</p>
+            <div className="flex justify-end">
+              <Button
+                onClick={() => {
+                  if (showReplyInput) {
+                    setShowReplyInput(false);
+                  } else {
+                    setShowReplyInput(true);
+                  }
+                }}
+              >
+                Reply
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      {showReplyInput && <ChildCommentInput />}
+    </div>
+  );
+}
+
+function ChildCommentInput(props) {
+  const [replyInput, setReplyInput] = useState("");
+  // const parentNoteID = props.parentNoteID;
+  // const parentReplyID = props.parentNo.id;
+  // const parentText = props.parentNote.text;
+  // const parentTimestamp = props.parentNote.timestamp;
+  // const parentAuthor = props.parentNote.author;
+  // const parentAuthorID = props.parentNote.authorID;
 
   return (
     <Card>
       <CardHeader className="!flex-row !space-y-0 items-center justify-between p-6">
-        {authorID && <AvatarManager userID={authorID} />}
-        <CardTitle className="text-2xl text-left">{author}</CardTitle>
-        {/*Reply Button */}
-        <ReplyInput parentNote={{ id, text, timestamp, author, authorID }} />
+        <CardTitle className="text-l text-left">Replying</CardTitle>
       </CardHeader>
 
       <CardContent>
         <div className="flex flex-col gap-6">
-          <p className="break-words overflow-hidden">{text}</p>
-          <p>{timestamp}</p>
+          <Textarea />
+          <div className="flex justify-end">
+            <Button>send</Button>
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-function ReplyInput(props) {
+function ParentReplyInput(props) {
   const [replyInput, setReplyInput] = useState("");
   const fetchReplies = props.fetchReplies;
   const parentNoteID = props.parentNote.id;
@@ -215,8 +267,13 @@ function ReplyInput(props) {
 
   const postReply = async function () {
     const response = await api.post("/reply", {
-      data: { parentNoteID: parentNoteID, text: replyInput },
+      data: {
+        parentNoteID: parentNoteID,
+        text: replyInput,
+        parentReplyID: parentReplyID,
+      },
     });
+
     setReplyInput("");
     fetchReplies();
   };
@@ -226,15 +283,6 @@ function ReplyInput(props) {
       <DrawerTrigger>Reply</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="flex flex-col items-center justify-center">
-          <Note
-            key={parentNoteID}
-            id={parentNoteID}
-            text={parentText}
-            timestamp={parentTimestamp}
-            author={parentAuthor}
-            authorID={parentAuthorID}
-            isReply={true}
-          ></Note>
           <Textarea
             value={replyInput}
             onChange={(e) => {

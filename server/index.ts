@@ -300,6 +300,8 @@ app.get("/api/v1/replies/:parentNoteID", async (req, res) => {
           timestamp: repliesTable.timestamp,
           user_id: repliesTable.user_id,
           username: usersTable.username,
+          parent_note_id: repliesTable.parent_note_id,
+          parent_reply_id: repliesTable.parent_reply_id,
         })
         .from(repliesTable)
         .leftJoin(usersTable, eq(repliesTable.user_id, usersTable.id))
@@ -320,6 +322,7 @@ app.get("/api/v1/replies/:parentNoteID", async (req, res) => {
 });
 
 //POST Reply
+//Pass in both a parent note ID AND a parent reply ID (if necessary)
 app.post("/api/v1/reply", async (req, res) => {
   const userID = await getLoggedInUserID(req);
   console.log(req.body.data);
