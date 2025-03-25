@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
 import { MoreVertical } from "lucide-react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
 import AvatarManager from "../components/AvatarManager.jsx";
 import "../App.css";
 import api from "../api.jsx";
@@ -175,6 +177,7 @@ function Note(props) {
                       authorID={reply.user_id}
                       parentNoteID={reply.parent_note_id}
                       parentReplyID={reply.parent_reply_id}
+                      fetchReplies={fetchReplies}
                     />
                   );
                 })}
@@ -193,9 +196,10 @@ function Comment(props) {
   const author = props.author;
   const authorID = props.authorID;
   const currentUser = props.currentUser;
-  const parentReplyID = props.parentReplyID;
   const parentNoteID = props.parentNoteID;
   const [showReplyInput, setShowReplyInput] = useState(false);
+
+  const fetchReplies = props.fetchReplies;
 
   return (
     <div>
@@ -224,19 +228,35 @@ function Comment(props) {
           </div>
         </CardContent>
       </Card>
-      {showReplyInput && <ChildCommentInput />}
+      {showReplyInput && (
+        <ChildCommentInput
+          parentComment={{ parentCommentID: id, parentNoteID: parentNoteID }}
+          fetchReplies={fetchReplies}
+        />
+      )}
     </div>
   );
 }
 
 function ChildCommentInput(props) {
   const [replyInput, setReplyInput] = useState("");
-  // const parentNoteID = props.parentNoteID;
-  // const parentReplyID = props.parentNo.id;
-  // const parentText = props.parentNote.text;
-  // const parentTimestamp = props.parentNote.timestamp;
-  // const parentAuthor = props.parentNote.author;
-  // const parentAuthorID = props.parentNote.authorID;
+  const fetchReplies = props.fetchReplies;
+  const parentCommentID = props.parentComment.parentCommentID;
+  const parentNoteID = props.parentComment.parentNoteID;
+
+  const postReply = async function () {
+    console.log("BUTT");
+    const response = await api.post("/reply", {
+      data: {
+        parentNoteID: parentNoteID,
+        text: replyInput,
+        parentReplyID: parentCommentID,
+      },
+    });
+
+    setReplyInput("");
+    fetchReplies();
+  };
 
   return (
     <Card>
@@ -246,9 +266,14 @@ function ChildCommentInput(props) {
 
       <CardContent>
         <div className="flex flex-col gap-6">
-          <Textarea />
+          <Textarea
+            value={replyInput}
+            onChange={(e) => {
+              setReplyInput(e.target.value);
+            }}
+          />
           <div className="flex justify-end">
-            <Button>send</Button>
+            <Button onClick={() => postReply()}>send</Button>
           </div>
         </div>
       </CardContent>
@@ -258,6 +283,7 @@ function ChildCommentInput(props) {
 
 function ParentReplyInput(props) {
   const [replyInput, setReplyInput] = useState("");
+
   const fetchReplies = props.fetchReplies;
   const parentNoteID = props.parentNote.id;
   const parentText = props.parentNote.text;
@@ -266,14 +292,15 @@ function ParentReplyInput(props) {
   const parentAuthorID = props.parentNote.authorID;
 
   const postReply = async function () {
+    console.log("I ran!!!!");
     const response = await api.post("/reply", {
       data: {
         parentNoteID: parentNoteID,
         text: replyInput,
-        parentReplyID: parentReplyID,
+        parentReplyID: null,
       },
     });
-
+    console.log("i ran!!!");
     setReplyInput("");
     fetchReplies();
   };
@@ -281,7 +308,11 @@ function ParentReplyInput(props) {
   return (
     <Drawer>
       <DrawerTrigger>Reply</DrawerTrigger>
+
       <DrawerContent>
+        <DrawerTitle>Reply</DrawerTitle>
+        <DrawerDescription>Fuck blind people</DrawerDescription>
+
         <DrawerHeader className="flex flex-col items-center justify-center">
           <Textarea
             value={replyInput}
@@ -291,18 +322,14 @@ function ParentReplyInput(props) {
           />
         </DrawerHeader>
         <DrawerFooter>
-          <DrawerClose>
-            <Button
-              onClick={(e) => {
-                postReply();
-              }}
-            >
-              Send
-            </Button>
+          <DrawerClose
+            onClick={(e) => {
+              postReply();
+            }}
+          >
+            Send
           </DrawerClose>
-          <DrawerClose>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
+          <DrawerClose>Cancel</DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
