@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
 import { MoreVertical } from "lucide-react";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 import AvatarManager from "../components/AvatarManager.jsx";
 import "../App.css";
@@ -311,7 +310,7 @@ function ParentReplyInput(props) {
 
       <DrawerContent>
         <DrawerTitle>Reply</DrawerTitle>
-        <DrawerDescription>Fuck blind people</DrawerDescription>
+        <DrawerDescription></DrawerDescription>
 
         <DrawerHeader className="flex flex-col items-center justify-center">
           <Textarea
