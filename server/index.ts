@@ -286,6 +286,34 @@ app.post("/api/v1/note", async (req, res) => {
   }
 });
 
+app.get("/api/v1/child_comments/:parentCommentID", async (req, res) => {
+  const parentCommentID = Number(req.params.parentCommentID);
+  const userID = await getLoggedInUserID(req);
+  if (userID !== null) {
+    try {
+      const data = await db2
+        .select({
+          id: repliesTable.id,
+          text: repliesTable.text,
+          timestamp: repliesTable.timestamp,
+          user_id: repliesTable.user_id,
+          username: usersTable.username,
+          parent_note_id: repliesTable.parent_note_id,
+          parent_comment_id: repliesTable.parent_comment_id,
+        })
+        .from(repliesTable)
+        .leftJoin(usersTable, eq(repliesTable.user_id, usersTable.id))
+        .where(eq(repliesTable.parent_comment_id, parentCommentID));
+
+      res.send(data);
+    } catch (error) {
+      res.status(500).send("error fetching data");
+    }
+  } else {
+    res.status(400).send("Not logged in!");
+  }
+});
+
 //GET Replies
 app.get("/api/v1/replies/:parentNoteID", async (req, res) => {
   const parentNoteID = Number(req.params.parentNoteID);
@@ -301,14 +329,14 @@ app.get("/api/v1/replies/:parentNoteID", async (req, res) => {
           user_id: repliesTable.user_id,
           username: usersTable.username,
           parent_note_id: repliesTable.parent_note_id,
-          parent_reply_id: repliesTable.parent_reply_id,
+          parent_comment_id: repliesTable.parent_comment_id,
         })
         .from(repliesTable)
         .leftJoin(usersTable, eq(repliesTable.user_id, usersTable.id))
         .where(
           and(
             eq(repliesTable.parent_note_id, parentNoteID),
-            isNull(repliesTable.parent_reply_id)
+            isNull(repliesTable.parent_comment_id)
           )
         );
 
@@ -325,11 +353,11 @@ app.get("/api/v1/replies/:parentNoteID", async (req, res) => {
 //Pass in both a parent note ID AND a parent reply ID (if necessary)
 app.post("/api/v1/reply", async (req, res) => {
   const userID = await getLoggedInUserID(req);
-  console.log(req.body.data);
 
   if (userID !== null) {
     const replyText = req.body.data.text;
     const parentNoteID = req.body.data.parentNoteID;
+    const parentCommentID = req.body.data.parentCommentID;
     if (!replyText) {
       res.status(400).json({ error: "Text field is required" });
       return;
@@ -338,6 +366,7 @@ app.post("/api/v1/reply", async (req, res) => {
       text: replyText,
       user_id: userID,
       parent_note_id: parentNoteID,
+      parent_comment_id: parentCommentID,
     } as ReplyInsert);
     res
       .status(201)

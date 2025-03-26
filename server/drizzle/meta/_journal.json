@@ -57,6 +57,13 @@
       "when": 1742139084923,
       "tag": "0007_normal_electro",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1742948508315,
+      "tag": "0008_melted_killmonger",
+      "breakpoints": true
     }
   ]
 }

@@ -126,7 +126,7 @@ function Note(props) {
         <CardTitle className="text-2xl text-left">{author}</CardTitle>
 
         {/*Reply Button */}
-        <ParentReplyInput
+        <ParentCommentInput
           fetchReplies={fetchReplies}
           parentNote={{ id, text, timestamp, author, authorID }}
         />
@@ -197,8 +197,16 @@ function Comment(props) {
   const currentUser = props.currentUser;
   const parentNoteID = props.parentNoteID;
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [childComments, setChildComments] = useState([]);
 
-  const fetchReplies = props.fetchReplies;
+  const fetchChildComments = async function () {
+    const response = await api.get(`/child_comments/${id}`);
+    setChildComments(response.data);
+  };
+
+  useEffect(() => {
+    fetchChildComments();
+  }, []);
 
   return (
     <div>
@@ -226,11 +234,27 @@ function Comment(props) {
             </div>
           </div>
         </CardContent>
+        {childComments &&
+          childComments.map((childComment) => {
+            return (
+              <Comment
+                key={childComment.id}
+                id={childComment.id}
+                text={childComment.text}
+                timestamp={childComment.timestamp}
+                author={childComment.username}
+                authorID={childComment.user_id}
+                parentNoteID={childComment.parent_note_id}
+                parentReplyID={childComment.parent_reply_id}
+              />
+            );
+          })}
       </Card>
+
       {showReplyInput && (
         <ChildCommentInput
           parentComment={{ parentCommentID: id, parentNoteID: parentNoteID }}
-          fetchReplies={fetchReplies}
+          fetchChildComments={fetchChildComments}
         />
       )}
     </div>
@@ -239,22 +263,21 @@ function Comment(props) {
 
 function ChildCommentInput(props) {
   const [replyInput, setReplyInput] = useState("");
-  const fetchReplies = props.fetchReplies;
+  const fetchChildComments = props.fetchChildComments;
   const parentCommentID = props.parentComment.parentCommentID;
   const parentNoteID = props.parentComment.parentNoteID;
 
-  const postReply = async function () {
-    console.log("BUTT");
+  const postComment = async function () {
     const response = await api.post("/reply", {
       data: {
         parentNoteID: parentNoteID,
         text: replyInput,
-        parentReplyID: parentCommentID,
+        parentCommentID: parentCommentID,
       },
     });
 
     setReplyInput("");
-    fetchReplies();
+    fetchChildComments();
   };
 
   return (
@@ -272,7 +295,7 @@ function ChildCommentInput(props) {
             }}
           />
           <div className="flex justify-end">
-            <Button onClick={() => postReply()}>send</Button>
+            <Button onClick={() => postComment()}>send</Button>
           </div>
         </div>
       </CardContent>
@@ -280,7 +303,7 @@ function ChildCommentInput(props) {
   );
 }
 
-function ParentReplyInput(props) {
+function ParentCommentInput(props) {
   const [replyInput, setReplyInput] = useState("");
 
   const fetchReplies = props.fetchReplies;
@@ -291,15 +314,13 @@ function ParentReplyInput(props) {
   const parentAuthorID = props.parentNote.authorID;
 
   const postReply = async function () {
-    console.log("I ran!!!!");
     const response = await api.post("/reply", {
       data: {
         parentNoteID: parentNoteID,
         text: replyInput,
-        parentReplyID: null,
+        parentCommentID: null,
       },
     });
-    console.log("i ran!!!");
     setReplyInput("");
     fetchReplies();
   };

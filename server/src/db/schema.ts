@@ -32,7 +32,7 @@ export const repliesTable = sqliteTable("replies", {
       onDelete: "cascade",
     })
     .default(null),
-  parent_reply_id: integer("parent_reply_id")
+  parent_comment_id: integer("parent_comment_id")
     .references(() => repliesTable.id, {
       onDelete: "cascade",
     })

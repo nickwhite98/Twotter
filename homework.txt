@@ -1,5 +1,9 @@
 Docker tutorial Cam recommended: https://youtu.be/0gCRw13C2Xw
 
+RECURSION!!!!!!!
+
+
+-----------------------------------------------------------------------
 Avatars: 
 DONE - 1. Update users table schema to store avatar path
 In prog - 1.5: image upload UI/functionality
@@ -14,10 +18,10 @@ In prog - 1.5: image upload UI/functionality
 
 ----------------------------------------------------------------------
 Replies: 
-1. Add ability to post a reply to a reply. 
-2. Frontend reply component needs to use that
-3. Fetch replies to a reply, update reply component to use that
-4. update reply component to fetch it's children
+1. DONE Add ability to post a reply to a reply. 
+2. DONE Frontend reply component needs to use that
+3. DONE Fetch replies to a reply, update reply component to use that
+4. DONE update reply component to fetch it's children
 5. add reply prop called depth. When rendering a reply from a note, depth = 0 
 6. why replying to a reply, it passes myDepth + 1 as depth prop
 
