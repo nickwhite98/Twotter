@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
 import { MoreVertical } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import AvatarManager from "../components/AvatarManager.jsx";
 import "../App.css";
@@ -100,6 +101,7 @@ function Note(props) {
   const username = token.username;
 
   const [replies, setReplies] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const deleteNote = async function () {
     const response = await api.delete("/note", {
@@ -113,6 +115,7 @@ function Note(props) {
   const fetchReplies = async function () {
     const response = await api.get(`/replies/${id}`);
     setReplies(response.data);
+    console.log(response.data);
   };
 
   useEffect(() => {
@@ -161,27 +164,35 @@ function Note(props) {
         <div className="flex flex-col gap-6">
           <p className="break-words overflow-hidden">{text}</p>
           <p>{timestamp}</p>
-          <Collapsible>
-            <CollapsibleTrigger>Comments</CollapsibleTrigger>
-            <CollapsibleContent>
-              {replies &&
-                replies.map((reply) => {
-                  return (
-                    <Comment
-                      key={reply.id}
-                      id={reply.id}
-                      text={reply.text}
-                      timestamp={reply.timestamp}
-                      author={reply.username}
-                      authorID={reply.user_id}
-                      parentNoteID={reply.parent_note_id}
-                      parentReplyID={reply.parent_reply_id}
-                      fetchReplies={fetchReplies}
-                    />
-                  );
-                })}
-            </CollapsibleContent>
-          </Collapsible>
+          {replies.length !== 0 && (
+            <Collapsible>
+              <CollapsibleTrigger
+                onClick={() => {
+                  setOpen(!open);
+                }}
+              >
+                {open ? <ChevronUp /> : <ChevronDown />}
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                {replies &&
+                  replies.map((reply) => {
+                    return (
+                      <Comment
+                        key={reply.id}
+                        id={reply.id}
+                        text={reply.text}
+                        timestamp={reply.timestamp}
+                        author={reply.username}
+                        authorID={reply.user_id}
+                        parentNoteID={reply.parent_note_id}
+                        parentReplyID={reply.parent_reply_id}
+                        fetchReplies={fetchReplies}
+                      />
+                    );
+                  })}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -229,7 +240,7 @@ function Comment(props) {
                   }
                 }}
               >
-                Reply
+                reply
               </Button>
             </div>
           </div>
@@ -255,6 +266,7 @@ function Comment(props) {
         <ChildCommentInput
           parentComment={{ parentCommentID: id, parentNoteID: parentNoteID }}
           fetchChildComments={fetchChildComments}
+          setShowReplyInput={setShowReplyInput}
         />
       )}
     </div>
@@ -266,6 +278,7 @@ function ChildCommentInput(props) {
   const fetchChildComments = props.fetchChildComments;
   const parentCommentID = props.parentComment.parentCommentID;
   const parentNoteID = props.parentComment.parentNoteID;
+  const setShowReplyInput = props.setShowReplyInput;
 
   const postComment = async function () {
     const response = await api.post("/reply", {
@@ -277,6 +290,7 @@ function ChildCommentInput(props) {
     });
 
     setReplyInput("");
+    setShowReplyInput(false);
     fetchChildComments();
   };
 
